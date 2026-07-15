@@ -1,0 +1,3 @@
+using dxpmt.Data; using dxpmt.Domain; using Microsoft.AspNetCore.Mvc; using Microsoft.AspNetCore.Mvc.RazorPages; using Microsoft.EntityFrameworkCore;
+namespace dxpmt.Pages.Problems;
+public sealed class IndexModel(ApplicationDbContext database):PageModel { [BindProperty(SupportsGet=true)] public int CaseId{get;set;} public ImprovementCase Case{get;private set;}=null!; public List<Problem> Items{get;private set;}=[]; public async Task<IActionResult> OnGetAsync(){var c=await database.Cases.AsNoTracking().SingleOrDefaultAsync(x=>x.Id==CaseId);if(c is null)return NotFound();Case=c;Items=await database.Problems.AsNoTracking().Include(x=>x.WorkItem).Where(x=>x.CaseId==CaseId).OrderBy(x=>x.Sequence).ToListAsync();return Page();}}

@@ -1,0 +1,80 @@
+@page
+@model dxpmt.Pages.Forms.F01Model
+@{
+    ViewData["Title"] = "F01 案件受付票";
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+{
+    <div class="alert alert-success" role="alert">@Model.SuccessMessage</div>
+}
+
+<div class="page-heading d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+    <div>
+        <p class="eyebrow">@Model.Case.CaseNumber / F01</p>
+        <h1>案件受付票</h1>
+        <p class="text-muted mb-0">「何を導入したいか」ではなく、困りごと・発生場面・現在の対応を記録します。</p>
+    </div>
+    <a class="btn btn-outline-secondary" asp-page="/Cases/Details" asp-route-id="@Model.Case.Id">案件詳細へ戻る</a>
+</div>
+
+<form method="post" class="form-card">
+    <input type="hidden" name="caseId" value="@Model.Case.Id" />
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+    <section class="form-section">
+        <h2>基本情報</h2>
+        <dl class="definition-list definition-list-grid">
+            <div><dt>案件番号</dt><dd>@Model.Case.CaseNumber</dd></div>
+            <div><dt>案件名</dt><dd>@Model.Case.Title</dd></div>
+            <div><dt>依頼部署</dt><dd>@Model.Case.RequestingDepartment</dd></div>
+            <div><dt>依頼者</dt><dd>@Model.Case.RequesterName</dd></div>
+            <div><dt>案件責任者</dt><dd>@Model.Case.OwnerName</dd></div>
+            <div><dt>緊急度</dt><dd>@Model.Case.Priority</dd></div>
+        </dl>
+    </section>
+    <section class="form-section">
+        <h2>相談・依頼内容</h2>
+        <div class="row g-3">
+            <div class="col-12"><label asp-for="Input.ProblemToSolve" class="form-label">困っていること／改善したいこと</label><textarea asp-for="Input.ProblemToSolve" class="form-control" rows="3"></textarea></div>
+            <div class="col-md-6"><label asp-for="Input.OccurrenceSituation" class="form-label">発生する場面</label><textarea asp-for="Input.OccurrenceSituation" class="form-control" rows="3"></textarea></div>
+            <div class="col-md-6"><label asp-for="Input.TargetBusinessAndDepartments" class="form-label">対象業務・部署</label><textarea asp-for="Input.TargetBusinessAndDepartments" class="form-control" rows="3"></textarea></div>
+            <div class="col-md-6"><label asp-for="Input.CurrentResponse" class="form-label">現在の対応方法</label><textarea asp-for="Input.CurrentResponse" class="form-control" rows="3"></textarea></div>
+            <div class="col-md-6"><label asp-for="Input.ExpectedState" class="form-label">期待する状態</label><textarea asp-for="Input.ExpectedState" class="form-control" rows="3"></textarea></div>
+            <div class="col-12"><label asp-for="Input.PreferredApproach" class="form-label">希望する手段（参考）</label><textarea asp-for="Input.PreferredApproach" class="form-control" rows="2"></textarea></div>
+        </div>
+    </section>
+    <section class="form-section">
+        <h2>影響</h2>
+        <div class="row g-3">
+            <div class="col-md-6"><label asp-for="Input.Impact.ManHoursAndCost" class="form-label">工数・費用</label><textarea asp-for="Input.Impact.ManHoursAndCost" class="form-control" rows="2"></textarea></div>
+            <div class="col-md-6"><label asp-for="Input.Impact.DeliveryAndCapacity" class="form-label">納期・処理能力</label><textarea asp-for="Input.Impact.DeliveryAndCapacity" class="form-control" rows="2"></textarea></div>
+            <div class="col-md-6"><label asp-for="Input.Impact.Quality" class="form-label">品質</label><textarea asp-for="Input.Impact.Quality" class="form-control" rows="2"></textarea></div>
+            <div class="col-md-6"><label asp-for="Input.Impact.InventoryAndLogistics" class="form-label">在庫・物流</label><textarea asp-for="Input.Impact.InventoryAndLogistics" class="form-control" rows="2"></textarea></div>
+            <div class="col-md-6"><label asp-for="Input.Impact.SafetyAndCompliance" class="form-label">安全・法令</label><textarea asp-for="Input.Impact.SafetyAndCompliance" class="form-control" rows="2"></textarea></div>
+            <div class="col-md-6"><label asp-for="Input.Impact.InternalControlAndSecurity" class="form-label">内部統制・セキュリティ</label><textarea asp-for="Input.Impact.InternalControlAndSecurity" class="form-control" rows="2"></textarea></div>
+            <div class="col-12"><label asp-for="Input.Impact.CustomersAndPartners" class="form-label">顧客・取引先</label><textarea asp-for="Input.Impact.CustomersAndPartners" class="form-control" rows="2"></textarea></div>
+        </div>
+    </section>
+    <section class="form-section">
+        <h2>発生状況</h2>
+        <div class="row g-3">
+            <div class="col-md-4"><label asp-for="Input.Frequency" class="form-label">発生頻度</label><input asp-for="Input.Frequency" class="form-control" /></div>
+            <div class="col-md-4"><label asp-for="Input.NumberOfCases" class="form-label">対象件数</label><input asp-for="Input.NumberOfCases" class="form-control" /></div>
+            <div class="col-md-4"><label asp-for="Input.OccurrencePeriod" class="form-label">発生期間</label><input asp-for="Input.OccurrencePeriod" class="form-control" /></div>
+            <div class="col-12"><label asp-for="Input.ExamplesAndEvidence" class="form-label">具体例・根拠資料</label><textarea asp-for="Input.ExamplesAndEvidence" class="form-control" rows="3"></textarea></div>
+        </div>
+    </section>
+    <section class="form-section">
+        <h2>初期判断</h2>
+        <div class="row g-3">
+            <div class="col-md-6"><label asp-for="Input.RelatedCasesAndExistingFunctions" class="form-label">関連案件・既存機能</label><textarea asp-for="Input.RelatedCasesAndExistingFunctions" class="form-control" rows="3"></textarea></div>
+            <div class="col-md-6"><label asp-for="Input.RelatedDepartments" class="form-label">想定関係部署</label><textarea asp-for="Input.RelatedDepartments" class="form-control" rows="3"></textarea></div>
+            <div class="col-12"><label asp-for="Input.ScopeSummary" class="form-label">概略対象範囲</label><textarea asp-for="Input.ScopeSummary" class="form-control" rows="3"></textarea></div>
+            <div class="col-md-4"><label asp-for="Input.InitialDecision" class="form-label">判断</label><select asp-for="Input.InitialDecision" class="form-select"><option>調査着手</option><option>追加情報待ち</option><option>移管</option><option>保留</option><option>却下</option></select></div>
+            <div class="col-md-8"><label asp-for="Input.DecisionReason" class="form-label">判断理由</label><input asp-for="Input.DecisionReason" class="form-control" /></div>
+            <div class="col-md-6"><label asp-for="Input.NextPerson" class="form-label">次担当者</label><input asp-for="Input.NextPerson" class="form-control" /></div>
+            <div class="col-md-6"><label asp-for="Input.NextDueDate" class="form-label">次回期限</label><input asp-for="Input.NextDueDate" class="form-control" type="date" /></div>
+        </div>
+    </section>
+    <div class="form-actions"><a class="btn btn-outline-secondary" asp-page="/Cases/Details" asp-route-id="@Model.Case.Id">戻る</a><button class="btn btn-primary" type="submit">F01を保存</button></div>
+</form>

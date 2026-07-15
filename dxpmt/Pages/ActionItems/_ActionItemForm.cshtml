@@ -1,0 +1,16 @@
+@model dxpmt.Pages.ActionItems.CreateModel
+<form method="post" class="form-card">
+    <input type="hidden" name="caseId" value="@Model.Case.Id" />
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+    <div class="row g-3">
+        <div class="col-md-4"><label asp-for="Input.RaisedOn" class="form-label"></label><input asp-for="Input.RaisedOn" class="form-control" type="date" /></div>
+        <div class="col-md-4"><label asp-for="Input.Category" class="form-label"></label><select asp-for="Input.Category" class="form-select">@foreach (var category in Model.Categories) { <option value="@category">@category</option> }</select></div>
+        <div class="col-md-4"><label asp-for="Input.Status" class="form-label"></label><select asp-for="Input.Status" class="form-select">@foreach (var status in Model.Statuses) { <option value="@status">@status</option> }</select></div>
+        <div class="col-12"><label asp-for="Input.Content" class="form-label"></label><textarea asp-for="Input.Content" class="form-control" rows="4"></textarea><span asp-validation-for="Input.Content" class="text-danger"></span></div>
+        <div class="col-md-6"><label asp-for="Input.ContactOrResponseTarget" class="form-label"></label><input asp-for="Input.ContactOrResponseTarget" class="form-control" /></div>
+        <div class="col-md-3"><label asp-for="Input.OwnerName" class="form-label"></label><input asp-for="Input.OwnerName" class="form-control" /></div>
+        <div class="col-md-3"><label asp-for="Input.DueDate" class="form-label"></label><input asp-for="Input.DueDate" class="form-control" type="date" /></div>
+        <div class="col-12"><label asp-for="Input.Response" class="form-label"></label><textarea asp-for="Input.Response" class="form-control" rows="3"></textarea></div>
+    </div>
+    <div class="form-actions"><a class="btn btn-outline-secondary" asp-page="/ActionItems/Index" asp-route-caseId="@Model.Case.Id">キャンセル</a><button class="btn btn-primary" type="submit">保存</button></div>
+</form>

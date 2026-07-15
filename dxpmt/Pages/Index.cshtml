@@ -1,10 +1,97 @@
-﻿@page
+@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "要対応";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="page-heading d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+    <div>
+        <p class="eyebrow">WORKFLOW DASHBOARD</p>
+        <h1>要対応</h1>
+        <p class="text-muted mb-0">案件の進捗、期限超過の課題、ゲート判断待ちを確認します。</p>
+    </div>
+    <a class="btn btn-primary" asp-page="/Cases/Create">案件を登録</a>
+</div>
+
+<section class="row g-3 mb-4" aria-label="案件の状況">
+    <div class="col-sm-6 col-lg-3">
+        <div class="summary-card">
+            <span>進行中案件</span>
+            <strong>@Model.ActiveCaseCount</strong>
+            <small>保留・中止・完了を除く</small>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="summary-card summary-card-alert">
+            <span>期限超過の課題</span>
+            <strong>@Model.OverdueActionItems.Count</strong>
+            <small>未完了の課題・宿題</small>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="summary-card">
+            <span>G0 判断待ち</span>
+            <strong>@Model.G0PendingCount</strong>
+            <small>調査着手前の案件</small>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="summary-card">
+            <span>G1 判断待ち</span>
+            <strong>@Model.G1PendingCount</strong>
+            <small>範囲確定前の案件</small>
+        </div>
+    </div>
+</section>
+
+<div class="row g-4">
+    <section class="col-lg-7">
+        <div class="panel h-100">
+            <div class="panel-heading">
+                <h2>ステータス別件数</h2>
+                <a asp-page="/Cases/Index">案件一覧へ</a>
+            </div>
+            @if (Model.StatusCounts.Count == 0)
+            {
+                <p class="empty-state">案件がまだありません。最初の案件を登録してください。</p>
+            }
+            else
+            {
+                <div class="status-count-list">
+                    @foreach (var item in Model.StatusCounts)
+                    {
+                        <div class="status-count-row">
+                            <span class="status-badge">@item.Status</span>
+                            <strong>@item.Count 件</strong>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </section>
+    <section class="col-lg-5">
+        <div class="panel h-100">
+            <div class="panel-heading">
+                <h2>期限超過の課題・宿題</h2>
+                <a asp-page="/ActionItems/Index">すべて表示</a>
+            </div>
+            @if (Model.OverdueActionItems.Count == 0)
+            {
+                <p class="empty-state">期限超過の課題・宿題はありません。</p>
+            }
+            else
+            {
+                <ul class="compact-list">
+                    @foreach (var item in Model.OverdueActionItems)
+                    {
+                        <li>
+                            <a asp-page="/Cases/Details" asp-route-id="@item.CaseId">@item.Case.CaseNumber</a>
+                            <span>@item.Content</span>
+                            <small>期限: @item.DueDate?.ToString("yyyy/MM/dd") / @item.OwnerName</small>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </section>
 </div>

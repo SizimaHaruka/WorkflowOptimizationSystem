@@ -1,0 +1,60 @@
+@page
+@model dxpmt.Pages.Cases.IndexModel
+@{
+    ViewData["Title"] = "案件一覧";
+}
+
+<div class="page-heading d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+    <div>
+        <p class="eyebrow">CASES</p>
+        <h1>案件一覧</h1>
+    </div>
+    <a class="btn btn-primary" asp-page="/Cases/Create">案件を登録</a>
+</div>
+
+<form method="get" class="filter-bar mb-4">
+    <div>
+        <label asp-for="Query">キーワード</label>
+        <input asp-for="Query" class="form-control" placeholder="案件番号・案件名・依頼部署" />
+    </div>
+    <div>
+        <label asp-for="Status">ステータス</label>
+        <select asp-for="Status" class="form-select">
+            <option value="">すべて</option>
+            @foreach (var status in Model.StatusOptions)
+            {
+                <option value="@status">@status</option>
+            }
+        </select>
+    </div>
+    <button class="btn btn-outline-primary" type="submit">検索</button>
+</form>
+
+<div class="panel p-0 overflow-hidden">
+    @if (Model.Cases.Count == 0)
+    {
+        <p class="empty-state m-0">該当する案件はありません。</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table app-table mb-0">
+                <thead><tr><th>案件番号</th><th>案件名</th><th>依頼部署</th><th>責任者</th><th>優先度</th><th>ステータス</th><th>更新日</th></tr></thead>
+                <tbody>
+                @foreach (var item in Model.Cases)
+                {
+                    <tr>
+                        <td><a asp-page="/Cases/Details" asp-route-id="@item.Id">@item.CaseNumber</a></td>
+                        <td><a asp-page="/Cases/Details" asp-route-id="@item.Id">@item.Title</a></td>
+                        <td>@item.RequestingDepartment</td>
+                        <td>@item.OwnerName</td>
+                        <td><span class="priority priority-@item.Priority">@item.Priority</span></td>
+                        <td><span class="status-badge">@item.Status</span></td>
+                        <td>@item.UpdatedAt.ToString("yyyy/MM/dd")</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

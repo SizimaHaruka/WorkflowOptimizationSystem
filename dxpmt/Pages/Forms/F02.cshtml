@@ -1,0 +1,97 @@
+@page
+@model dxpmt.Pages.Forms.F02Model
+@{
+    ViewData["Title"] = "F02 調査計画票";
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+{
+    <div class="alert alert-success" role="alert">@Model.SuccessMessage</div>
+}
+
+<div class="page-heading d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+    <div>
+        <p class="eyebrow">@Model.Case.CaseNumber / F02</p>
+        <h1>調査計画票</h1>
+        <p class="text-muted mb-0">対象範囲と関係者、調査方法を明確にし、G1 範囲確定の根拠にします。</p>
+    </div>
+    <a class="btn btn-outline-secondary" asp-page="/Cases/Details" asp-route-id="@Model.Case.Id">案件詳細へ戻る</a>
+</div>
+
+<form method="post" class="form-card">
+    <input type="hidden" name="caseId" value="@Model.Case.Id" />
+    <section class="form-section">
+        <h2>基本情報</h2>
+        <div class="row g-3">
+            <div class="col-md-6"><label class="form-label">案件番号</label><input class="form-control" value="@Model.Case.CaseNumber" disabled /></div>
+            <div class="col-md-6"><label class="form-label">案件名</label><input class="form-control" value="@Model.Case.Title" disabled /></div>
+            <div class="col-md-4"><label asp-for="Input.SurveyLead" class="form-label">調査責任者</label><input asp-for="Input.SurveyLead" class="form-control" /></div>
+            <div class="col-md-4"><label asp-for="Input.SurveyStartDate" class="form-label">調査開始日</label><input asp-for="Input.SurveyStartDate" class="form-control" type="date" /></div>
+            <div class="col-md-4"><label asp-for="Input.SurveyEndDate" class="form-label">調査終了日</label><input asp-for="Input.SurveyEndDate" class="form-control" type="date" /></div>
+            <div class="col-12"><label asp-for="Input.TargetSitesAndDepartments" class="form-label">対象拠点・部署</label><input asp-for="Input.TargetSitesAndDepartments" class="form-control" /></div>
+        </div>
+    </section>
+    <section class="form-section">
+        <h2>調査範囲</h2>
+        <div class="row g-3">
+            <div class="col-md-6"><label asp-for="Input.StartEvent" class="form-label">開始イベント</label><textarea asp-for="Input.StartEvent" class="form-control" rows="3"></textarea></div>
+            <div class="col-md-6"><label asp-for="Input.EndStateAndDeliverable" class="form-label">終了状態・成果物</label><textarea asp-for="Input.EndStateAndDeliverable" class="form-control" rows="3"></textarea></div>
+            <div class="col-md-6"><label asp-for="Input.TargetBusiness" class="form-label">対象業務</label><textarea asp-for="Input.TargetBusiness" class="form-control" rows="3"></textarea></div>
+            <div class="col-md-6"><label asp-for="Input.TargetProductCustomerPeriod" class="form-label">対象製品・顧客・期間等</label><textarea asp-for="Input.TargetProductCustomerPeriod" class="form-control" rows="3"></textarea></div>
+            <div class="col-md-6"><label asp-for="Input.ExcludedScope" class="form-label">対象外</label><textarea asp-for="Input.ExcludedScope" class="form-control" rows="3"></textarea></div>
+            <div class="col-md-6"><label asp-for="Input.ExceptionConditions" class="form-label">通常時以外に確認する条件</label><textarea asp-for="Input.ExceptionConditions" class="form-control" rows="3"></textarea></div>
+        </div>
+    </section>
+    <section class="form-section">
+        <h2>関係者</h2>
+        <div class="table-responsive">
+            <table class="table app-table input-table"><thead><tr><th>部署・組織</th><th>氏名・役割</th><th>確認内容</th><th>参加方法</th></tr></thead><tbody>
+            @for (var i = 0; i < Model.Input.Stakeholders.Count; i++)
+            {
+                <tr>
+                    <td><input asp-for="Input.Stakeholders[i].DepartmentOrOrganization" class="form-control form-control-sm" /></td>
+                    <td><input asp-for="Input.Stakeholders[i].NameAndRole" class="form-control form-control-sm" /></td>
+                    <td><input asp-for="Input.Stakeholders[i].ConfirmationTarget" class="form-control form-control-sm" /></td>
+                    <td><input asp-for="Input.Stakeholders[i].ParticipationMethod" class="form-control form-control-sm" /></td>
+                </tr>
+            }
+            </tbody></table>
+        </div>
+    </section>
+    <section class="form-section">
+        <h2>調査方法・日程</h2>
+        <div class="table-responsive">
+            <table class="table app-table input-table"><thead><tr><th>No.</th><th>方法</th><th>対象</th><th>担当</th><th>予定日</th><th>完了</th></tr></thead><tbody>
+            @for (var i = 0; i < Model.Input.SurveySteps.Count; i++)
+            {
+                <tr>
+                    <td><input asp-for="Input.SurveySteps[i].Sequence" class="form-control form-control-sm" /></td>
+                    <td><input asp-for="Input.SurveySteps[i].Method" class="form-control form-control-sm" /></td>
+                    <td><input asp-for="Input.SurveySteps[i].Target" class="form-control form-control-sm" /></td>
+                    <td><input asp-for="Input.SurveySteps[i].Owner" class="form-control form-control-sm" /></td>
+                    <td><input asp-for="Input.SurveySteps[i].PlannedOn" class="form-control form-control-sm" type="date" /></td>
+                    <td class="text-center"><input asp-for="Input.SurveySteps[i].IsCompleted" class="form-check-input" /></td>
+                </tr>
+            }
+            </tbody></table>
+        </div>
+    </section>
+    <section class="form-section">
+        <h2>必要資料</h2>
+        <div class="table-responsive">
+            <table class="table app-table input-table"><thead><tr><th>資料名</th><th>保有部署</th><th>依頼日</th><th>入手日</th><th>備考</th></tr></thead><tbody>
+            @for (var i = 0; i < Model.Input.RequiredMaterials.Count; i++)
+            {
+                <tr>
+                    <td><input asp-for="Input.RequiredMaterials[i].Name" class="form-control form-control-sm" /></td>
+                    <td><input asp-for="Input.RequiredMaterials[i].OwningDepartment" class="form-control form-control-sm" /></td>
+                    <td><input asp-for="Input.RequiredMaterials[i].RequestedOn" class="form-control form-control-sm" type="date" /></td>
+                    <td><input asp-for="Input.RequiredMaterials[i].ReceivedOn" class="form-control form-control-sm" type="date" /></td>
+                    <td><input asp-for="Input.RequiredMaterials[i].Notes" class="form-control form-control-sm" /></td>
+                </tr>
+            }
+            </tbody></table>
+        </div>
+    </section>
+    <div class="form-actions"><a class="btn btn-outline-secondary" asp-page="/Cases/Details" asp-route-id="@Model.Case.Id">戻る</a><button class="btn btn-primary" type="submit">F02を保存</button></div>
+</form>

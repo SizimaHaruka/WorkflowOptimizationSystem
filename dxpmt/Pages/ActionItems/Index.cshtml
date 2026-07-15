@@ -1,0 +1,43 @@
+@page
+@model dxpmt.Pages.ActionItems.IndexModel
+@{
+    ViewData["Title"] = "課題・宿題";
+}
+
+<div class="page-heading d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+    <div>
+        <p class="eyebrow">F10 ACTION ITEMS</p>
+        <h1>@(Model.SelectedCase is null ? "課題・宿題" : $"課題・宿題 - {Model.SelectedCase.CaseNumber}")</h1>
+        @if (Model.SelectedCase is not null)
+        {
+            <p class="text-muted mb-0">@Model.SelectedCase.Title</p>
+        }
+    </div>
+    @if (Model.SelectedCase is not null)
+    {
+        <div class="d-flex gap-2"><a class="btn btn-outline-secondary" asp-page="/Cases/Details" asp-route-id="@Model.SelectedCase.Id">案件詳細</a><a class="btn btn-primary" asp-page="/ActionItems/Create" asp-route-caseId="@Model.SelectedCase.Id">課題・宿題を追加</a></div>
+    }
+</div>
+
+@if (Model.SelectedCase is null)
+{
+    <div class="alert alert-info">案件詳細から「課題・宿題を追加」を選ぶと、案件に紐付けて登録できます。</div>
+}
+
+<div class="panel p-0 overflow-hidden">
+    @if (Model.Items.Count == 0)
+    {
+        <p class="empty-state m-0">表示する課題・宿題はありません。</p>
+    }
+    else
+    {
+        <div class="table-responsive"><table class="table app-table mb-0"><thead><tr><th>案件</th><th>No.</th><th>区分</th><th>内容</th><th>担当</th><th>期限</th><th>状態</th><th></th></tr></thead><tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td><a asp-page="/Cases/Details" asp-route-id="@item.CaseId">@item.Case.CaseNumber</a></td><td>@item.Sequence</td><td>@item.Category</td><td class="pre-wrap">@item.Content</td><td>@item.OwnerName</td><td>@(item.DueDate?.ToString("yyyy/MM/dd") ?? "—")</td><td><span class="status-badge">@item.Status</span></td><td><a class="btn btn-sm btn-outline-primary" asp-page="/ActionItems/Edit" asp-route-id="@item.Id">更新</a></td>
+            </tr>
+        }
+        </tbody></table></div>
+    }
+</div>

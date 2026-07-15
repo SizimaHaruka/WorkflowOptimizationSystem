@@ -1,0 +1,5 @@
+@page
+@model dxpmt.Pages.WorkItems.CreateModel
+@{ ViewData["Title"]="F03 作業ヒアリング票"; }
+<div class="page-heading d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4"><div><p class="eyebrow">@Model.Case.CaseNumber / F03</p><h1>作業ヒアリング票</h1><p class="text-muted mb-0">現場で使う名称のまま、実際の作業を記録します。</p></div><a class="btn btn-outline-secondary" asp-page="/WorkItems/Index" asp-route-caseId="@Model.Case.Id">一覧へ戻る</a></div>
+<partial name="_WorkItemForm" model="Model" />

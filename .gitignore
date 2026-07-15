@@ -63,6 +63,17 @@ project.lock.json
 project.fragment.lock.json
 artifacts/
 
+# Local application settings and runtime data
+appsettings.Local.json
+appsettings.*.Local.json
+.env
+.env.*
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+wwwroot/uploads/
+
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
 

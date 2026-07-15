@@ -1,0 +1,19 @@
+namespace dxpmt.Domain;
+
+public sealed class WorkItem
+{
+    public int Id { get; set; }
+    public int CaseId { get; set; }
+    public int Sequence { get; set; }
+    public string BusinessProcessName { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string DepartmentAndRole { get; set; } = string.Empty;
+    public string Performer { get; set; } = string.Empty;
+    public string Location { get; set; } = string.Empty;
+    public bool IsConfirmed { get; set; }
+    public string ContentJson { get; set; } = "{}";
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+    public ImprovementCase Case { get; set; } = null!;
+    public ICollection<Problem> Problems { get; set; } = [];
+}

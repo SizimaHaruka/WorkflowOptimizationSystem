@@ -1,0 +1,159 @@
+@page "{id:int}"
+@model dxpmt.Pages.Cases.DetailsModel
+@{
+    ViewData["Title"] = Model.Case.CaseNumber;
+    var f01 = Model.Case.Forms.SingleOrDefault(x => x.FormType == FormTypes.Reception);
+    var f02 = Model.Case.Forms.SingleOrDefault(x => x.FormType == FormTypes.SurveyPlan);
+    var g0 = Model.Case.GateReviews.Where(x => x.Gate == Gates.G0).OrderByDescending(x => x.CreatedAt).FirstOrDefault();
+    var g1 = Model.Case.GateReviews.Where(x => x.Gate == Gates.G1).OrderByDescending(x => x.CreatedAt).FirstOrDefault();
+    var g2 = Model.Case.GateReviews.Where(x => x.Gate == Gates.G2).OrderByDescending(x => x.CreatedAt).FirstOrDefault();
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+{
+    <div class="alert alert-success" role="alert">@Model.SuccessMessage</div>
+}
+
+<div class="page-heading mb-4">
+    <div class="d-flex flex-wrap justify-content-between gap-3 align-items-start">
+        <div>
+            <p class="eyebrow">@Model.Case.CaseNumber</p>
+            <h1>@Model.Case.Title</h1>
+            <p class="text-muted mb-0">依頼部署: @Model.Case.RequestingDepartment / 責任者: @Model.Case.OwnerName</p>
+        </div>
+        <div class="text-end">
+            <span class="status-badge status-badge-large">@Model.Case.Status</span>
+            <p class="small text-muted mt-2 mb-0">受付日: @Model.Case.RegisteredOn.ToString("yyyy/MM/dd")</p>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-8">
+        <section class="panel mb-4">
+            <div class="panel-heading">
+                <h2>フェーズ1の入力</h2>
+                <span class="text-muted small">保存状態を確認しながら順に進めます</span>
+            </div>
+            <div class="workflow-links">
+                <a class="workflow-link" asp-page="/Forms/F01" asp-route-caseId="@Model.Case.Id">
+                    <span class="workflow-code">F01</span>
+                    <span><strong>案件受付票</strong><small>@(f01?.Status ?? "未作成") / 最終更新: @(f01?.UpdatedAt.ToString("yyyy/MM/dd HH:mm") ?? "—")</small></span>
+                    <span aria-hidden="true">→</span>
+                </a>
+                <a class="workflow-link" asp-page="/Forms/F02" asp-route-caseId="@Model.Case.Id">
+                    <span class="workflow-code">F02</span>
+                    <span><strong>調査計画票</strong><small>@(f02?.Status ?? "未作成") / 最終更新: @(f02?.UpdatedAt.ToString("yyyy/MM/dd HH:mm") ?? "—")</small></span>
+                    <span aria-hidden="true">→</span>
+                </a>
+                <a class="workflow-link" asp-page="/ActionItems/Create" asp-route-caseId="@Model.Case.Id">
+                    <span class="workflow-code">F10</span>
+                    <span><strong>課題・宿題管理表</strong><small>@Model.Case.ActionItems.Count 件（未完了: @Model.Case.ActionItems.Count(x => x.Status != ActionItemStatuses.Completed) 件）</small></span>
+                    <span aria-hidden="true">→</span>
+                </a>
+                <a class="workflow-link" asp-page="/Decisions/Create" asp-route-caseId="@Model.Case.Id">
+                    <span class="workflow-code">F11</span>
+                    <span><strong>意思決定記録</strong><small>@Model.Case.DecisionRecords.Count 件</small></span>
+                    <span aria-hidden="true">→</span>
+                </a>
+            </div>
+        </section>
+
+        <section class="panel mb-4">
+            <div class="panel-heading"><h2>As-Is調査・問題分析</h2></div>
+            <div class="workflow-links">
+                <a class="workflow-link" asp-page="/WorkItems/Index" asp-route-caseId="@Model.Case.Id"><span class="workflow-code">F03</span><span><strong>作業ヒアリング票</strong><small>作業単位で実態を記録</small></span><span>→</span></a>
+                <a class="workflow-link" asp-page="/Forms/F04" asp-route-caseId="@Model.Case.Id"><span class="workflow-code">F04</span><span><strong>業務フロー整理票</strong><small>作業をつなげて確認</small></span><span>→</span></a>
+                <a class="workflow-link" asp-page="/Problems/Index" asp-route-caseId="@Model.Case.Id"><span class="workflow-code">F05</span><span><strong>問題・課題一覧</strong><small>作業に紐付けて分析</small></span><span>→</span></a>
+            </div>
+        </section>
+
+        <section class="panel mb-4">
+            <div class="panel-heading">
+                <h2>ゲート判定</h2>
+                <span class="text-muted small">判定者・判断日・コメント・チェック結果を履歴として保存</span>
+            </div>
+            <div class="gate-grid">
+                <div class="gate-card">
+                    <div><span class="workflow-code">G0</span><strong>調査着手</strong></div>
+                    <p>@(g0 is null ? "未判定" : $"{g0.Decision} / {g0.ReviewerName} / {g0.ReviewedOn:yyyy/MM/dd}")</p>
+                    <a class="btn btn-outline-primary btn-sm" asp-page="/Cases/Gate" asp-route-caseId="@Model.Case.Id" asp-route-gate="G0">G0を判定</a>
+                </div>
+                <div class="gate-card">
+                    <div><span class="workflow-code">G2</span><strong>As-Is確定</strong></div>
+                    <p>@(g2 is null ? "未判定" : $"{g2.Decision} / {g2.ReviewerName} / {g2.ReviewedOn:yyyy/MM/dd}")</p>
+                    <a class="btn btn-outline-primary btn-sm" asp-page="/Cases/Gate" asp-route-caseId="@Model.Case.Id" asp-route-gate="G2">G2を判定</a>
+                </div>
+                <div class="gate-card">
+                    <div><span class="workflow-code">G1</span><strong>範囲確定</strong></div>
+                    <p>@(g1 is null ? "未判定" : $"{g1.Decision} / {g1.ReviewerName} / {g1.ReviewedOn:yyyy/MM/dd}")</p>
+                    <a class="btn btn-outline-primary btn-sm" asp-page="/Cases/Gate" asp-route-caseId="@Model.Case.Id" asp-route-gate="G1">G1を判定</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-heading"><h2>ステータス履歴</h2></div>
+            @if (Model.Case.StatusHistory.Count == 0)
+            {
+                <p class="empty-state">履歴はありません。</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table app-table mb-0">
+                        <thead><tr><th>日時</th><th>変更</th><th>変更者</th><th>コメント</th></tr></thead>
+                        <tbody>
+                        @foreach (var item in Model.Case.StatusHistory.OrderByDescending(x => x.ChangedAt))
+                        {
+                            <tr><td>@item.ChangedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm")</td><td>@item.PreviousStatus → @item.NewStatus</td><td>@item.ChangedBy</td><td>@item.Comment</td></tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </section>
+    </div>
+    <aside class="col-xl-4">
+        <section class="panel mb-4">
+            <h2>案件情報</h2>
+            <dl class="definition-list">
+                <div><dt>優先度</dt><dd>@Model.Case.Priority</dd></div>
+                <div><dt>希望時期</dt><dd>@(Model.Case.DesiredBy?.ToString("yyyy/MM/dd") ?? "未確認")</dd></div>
+                <div><dt>概略対象範囲</dt><dd class="pre-wrap">@(string.IsNullOrWhiteSpace(Model.Case.ScopeSummary) ? "未確認" : Model.Case.ScopeSummary)</dd></div>
+            </dl>
+        </section>
+        <section class="panel">
+            <h2>ステータス変更</h2>
+            <p class="small text-muted">認証導入前のため、変更者を入力して履歴に残します。</p>
+            <form method="post" asp-page-handler="ChangeStatus">
+                <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+                <div class="mb-3">
+                    <label asp-for="StatusChange.NewStatus" class="form-label"></label>
+                    <select asp-for="StatusChange.NewStatus" class="form-select">
+                        <option value="">選択してください</option>
+                        @foreach (var status in Model.StatusOptions)
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    </select>
+                    <span asp-validation-for="StatusChange.NewStatus" class="text-danger small"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="StatusChange.ChangedBy" class="form-label"></label>
+                    <input asp-for="StatusChange.ChangedBy" class="form-control" />
+                    <span asp-validation-for="StatusChange.ChangedBy" class="text-danger small"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="StatusChange.Comment" class="form-label"></label>
+                    <textarea asp-for="StatusChange.Comment" class="form-control" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">変更を記録</button>
+            </form>
+        </section>
+    </aside>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

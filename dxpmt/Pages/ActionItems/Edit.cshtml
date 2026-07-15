@@ -1,0 +1,21 @@
+@page "{id:int}"
+@model dxpmt.Pages.ActionItems.EditModel
+@{
+    ViewData["Title"] = "課題・宿題を更新";
+}
+<div class="page-heading d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4"><div><p class="eyebrow">@Model.Item.Case.CaseNumber / F10-@Model.Item.Sequence</p><h1>課題・宿題を更新</h1></div><a class="btn btn-outline-secondary" asp-page="/ActionItems/Index" asp-route-caseId="@Model.Item.CaseId">一覧へ戻る</a></div>
+<form method="post" class="form-card">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+    <div class="row g-3">
+        <div class="col-md-4"><label asp-for="Input.RaisedOn" class="form-label">発生日</label><input asp-for="Input.RaisedOn" class="form-control" type="date" /></div>
+        <div class="col-md-4"><label asp-for="Input.Category" class="form-label">区分</label><select asp-for="Input.Category" class="form-select">@foreach (var category in Model.Categories) { <option value="@category">@category</option> }</select></div>
+        <div class="col-md-4"><label asp-for="Input.Status" class="form-label">状態</label><select asp-for="Input.Status" class="form-select">@foreach (var status in Model.Statuses) { <option value="@status">@status</option> }</select></div>
+        <div class="col-12"><label asp-for="Input.Content" class="form-label">内容</label><textarea asp-for="Input.Content" class="form-control" rows="4"></textarea><span asp-validation-for="Input.Content" class="text-danger"></span></div>
+        <div class="col-md-6"><label asp-for="Input.ContactOrResponseTarget" class="form-label">確認・対応先</label><input asp-for="Input.ContactOrResponseTarget" class="form-control" /></div>
+        <div class="col-md-3"><label asp-for="Input.OwnerName" class="form-label">担当</label><input asp-for="Input.OwnerName" class="form-control" /></div>
+        <div class="col-md-3"><label asp-for="Input.DueDate" class="form-label">期限</label><input asp-for="Input.DueDate" class="form-control" type="date" /></div>
+        <div class="col-12"><label asp-for="Input.Response" class="form-label">回答・処置</label><textarea asp-for="Input.Response" class="form-control" rows="3"></textarea></div>
+    </div>
+    <div class="form-actions"><a class="btn btn-outline-secondary" asp-page="/ActionItems/Index" asp-route-caseId="@Model.Item.CaseId">キャンセル</a><button class="btn btn-primary" type="submit">更新</button></div>
+</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

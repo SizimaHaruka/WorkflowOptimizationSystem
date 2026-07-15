@@ -1,0 +1,9 @@
+@page
+@model dxpmt.Pages.ActionItems.CreateModel
+@{
+    ViewData["Title"] = "課題・宿題を追加";
+}
+
+<div class="page-heading d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4"><div><p class="eyebrow">@Model.Case.CaseNumber / F10</p><h1>課題・宿題を追加</h1><p class="text-muted mb-0">@Model.Case.Title</p></div><a class="btn btn-outline-secondary" asp-page="/ActionItems/Index" asp-route-caseId="@Model.Case.Id">一覧へ戻る</a></div>
+<partial name="_ActionItemForm" model="Model" />
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
