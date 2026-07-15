@@ -1,4 +1,94 @@
 ﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
 // for details on configuring this project to bundle and minify static web assets.
 
-// Write your JavaScript code.
+// 記入例は placeholder として表示するため、未入力のまま送信されることはありません。
+document.addEventListener("DOMContentLoaded", () => {
+    const examples = {
+        "Input.Title": "例：出荷実績の転記作業を削減したい",
+        "Input.RequestingDepartment": "例：物流部 出荷管理課",
+        "Input.RequesterName": "例：山田 太郎",
+        "Input.OwnerName": "例：業務改善推進室 佐藤",
+        "Input.ProblemToSolve": "例：出荷実績を3つの台帳へ手作業で転記している",
+        "Input.OccurrenceSituation": "例：日次の出荷締め後、担当者がExcelへ転記する際",
+        "Input.TargetBusinessAndDepartments": "例：出荷実績管理／物流部・経理部",
+        "Input.CurrentResponse": "例：担当者が台帳を確認しながら手入力している",
+        "Input.ExpectedState": "例：1回の入力で各台帳に反映され、転記ミスがない",
+        "Input.PreferredApproach": "例：既存システムからCSVを自動連携したい",
+        "Input.Frequency": "例：毎営業日",
+        "Input.NumberOfCases": "例：1日あたり約80件",
+        "Input.OccurrencePeriod": "例：2026年4月から継続",
+        "Input.ExamplesAndEvidence": "例：転記誤り3件／月、作業時間90分／日",
+        "Input.RelatedCasesAndExistingFunctions": "例：販売管理システムの出荷CSV出力機能",
+        "Input.ScopeSummary": "例：出荷確定から実績台帳更新まで",
+        "Input.RelatedDepartments": "例：物流部、経理部、情報システム部",
+        "Input.DecisionReason": "例：影響範囲と発生頻度が大きいため調査を開始する",
+        "Input.NextPerson": "例：物流部 出荷管理課 鈴木",
+        "Input.Impact.ManHoursAndCost": "例：月30時間の転記作業と修正対応が発生",
+        "Input.Impact.DeliveryAndCapacity": "例：締め処理が遅れると翌日の出荷計画に影響",
+        "Input.Impact.Quality": "例：転記漏れにより請求金額が誤るおそれ",
+        "Input.SurveyLead": "例：業務改善推進室 佐藤",
+        "Input.TargetSitesAndDepartments": "例：東京物流センター／物流部 出荷管理課",
+        "Input.StartEvent": "例：出荷指示が確定する",
+        "Input.EndStateAndDeliverable": "例：出荷実績が各台帳へ反映されている",
+        "Input.TargetBusiness": "例：出荷実績の登録・確認業務",
+        "Input.TargetProductCustomerPeriod": "例：国内出荷、通常月の平日",
+        "Input.ExcludedScope": "例：海外出荷と返品処理は対象外",
+        "Input.ExceptionConditions": "例：特急出荷、システム停止時、月末繁忙時",
+        "Input.BusinessProcessName": "例：出荷実績管理",
+        "Input.Name": "例：出荷実績を台帳へ転記する",
+        "Input.DepartmentAndRole": "例：物流部／出荷担当",
+        "Input.Performer": "例：出荷担当者",
+        "Input.Location": "例：東京物流センター事務所",
+        "Input.Content.Purpose": "例：出荷実績を関係部門へ正しく共有する",
+        "Input.Content.StartTrigger": "例：出荷確定の通知メールを受信する",
+        "Input.Content.PreviousWork": "例：出荷担当が出荷確定データを作成する",
+        "Input.Content.CompletionCondition": "例：3つの台帳への登録と担当者確認が完了する",
+        "Input.Content.ActualSteps": "例：CSVを開く → 台帳Aへ転記 → 台帳Bへ転記 → 件数を照合する",
+        "Input.Content.InformationAndAssets": "例：出荷CSV、Excel台帳、販売管理システム",
+        "Input.Content.JudgementAndConfirmation": "例：数量差異がないか、品番が有効かを確認する",
+        "Input.Content.ExceptionsAndDifferences": "例：特急出荷はメールで経理へ連絡して手入力する",
+        "Input.Content.Workload": "例：通常1件2分、月末は1日90分",
+        "Input.Content.CurrentProblems": "例：同じ内容を3回入力し、転記漏れが発生する",
+        "Input.Content.UnconfirmedItems": "例：経理台帳への自動連携可否を確認する",
+        "Input.FlowName": "例：出荷実績登録フロー",
+        "Input.Scope": "例：出荷確定から請求用台帳の更新まで",
+        "Input.Author": "例：業務改善推進室 佐藤",
+        "Input.Reviewer": "例：物流部 出荷管理課長",
+        "Input.KeyJudgements": "例：出荷確定後に数量差異があれば担当者へ確認する",
+        "Input.KeyExceptions": "例：月末締め後の修正は経理承認後に差戻す",
+        "Input.Phenomenon": "例：同一の出荷実績を複数台帳へ手入力している",
+        "Input.OccurrenceCondition": "例：毎営業日の出荷締め後、約80件",
+        "Input.Impact": "例：1日90分の作業と転記誤りによる修正が発生",
+        "Input.CurrentWorkaround": "例：担当者が二重チェック表で確認している",
+        "Input.CauseHypothesis": "例：システム間にデータ連携がない",
+        "Input.Evidence": "例：2026年6月の作業記録、転記誤り3件",
+        "Input.Content": "例：経理台帳への自動連携の可否を確認する",
+        "Input.ContactOrResponseTarget": "例：情報システム部 システム運用担当",
+        "Input.Response": "例：連携APIの利用可否を7月末までに回答する",
+        "Input.DeciderName": "例：物流部長 田中",
+        "Input.Participants": "例：物流部、経理部、情報システム部",
+        "Input.Decision": "例：出荷実績CSVを経理台帳へ自動連携する",
+        "Input.Constraints": "例：既存の販売管理システムは改修しない",
+        "Input.BackgroundAndProblem": "例：手入力による転記負荷と誤りが毎月発生している",
+        "Input.Alternatives": "例：RPA導入、CSV自動連携、現行運用の継続",
+        "Input.ReasonForDecision": "例：保守性と費用対効果からCSV自動連携を採用する",
+        "Input.RejectedAlternatives": "例：RPAは画面変更時の保守負荷が大きいため不採用",
+        "Input.References": "例：2026年度業務改善検討資料、作業時間実績",
+        "Input.FollowUpActions": "例：情報システム部が連携仕様を作成しレビューする",
+        "Input.ReviewCondition": "例：稼働1か月後に作業時間とエラー件数を確認する",
+        "Input.CreatedBy": "例：業務改善推進室 佐藤",
+        "Input.ConfirmedBy": "例：物流部 出荷管理課長",
+        "Input.ApprovedBy": "例：物流部長 田中",
+        "Input.ReviewerName": "例：業務改善推進室 佐藤",
+        "StatusChange.ChangedBy": "例：業務改善推進室 佐藤",
+        "StatusChange.Comment": "例：調査計画のレビュー完了に伴い次工程へ進める"
+    };
+
+    document.querySelectorAll("input:not([type=hidden]):not([type=checkbox]):not([type=date]), textarea").forEach(field => {
+        const example = examples[field.name]
+            ?? (field.name.includes("Stakeholders") ? "例：物流部／出荷担当／出荷実績の確認／ヒアリング" : undefined)
+            ?? (field.name.includes("SurveySteps") ? "例：出荷実績データを確認する" : undefined)
+            ?? (field.name.includes("RequiredMaterials") ? "例：出荷実績CSV（物流部保管）" : undefined);
+        if (example && !field.value && !field.placeholder) field.placeholder = example;
+    });
+});

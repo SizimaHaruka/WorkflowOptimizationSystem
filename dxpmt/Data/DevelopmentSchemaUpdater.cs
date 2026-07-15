@@ -20,6 +20,8 @@ public static class DevelopmentSchemaUpdater
                     [Performer] nvarchar(100) NOT NULL DEFAULT N'',
                     [Location] nvarchar(200) NOT NULL DEFAULT N'',
                     [IsConfirmed] bit NOT NULL,
+                    [IsDeleted] bit NOT NULL DEFAULT 0,
+                    [DeletedAt] datetime2 NULL,
                     [ContentJson] nvarchar(max) NOT NULL,
                     [CreatedAt] datetime2 NOT NULL,
                     [UpdatedAt] datetime2 NOT NULL,
@@ -27,6 +29,13 @@ public static class DevelopmentSchemaUpdater
                     CONSTRAINT [IX_WorkItems_CaseId_Sequence] UNIQUE ([CaseId], [Sequence])
                 );
             END
+            """);
+
+        database.Database.ExecuteSqlRaw("""
+            IF COL_LENGTH(N'[dbo].[WorkItems]', N'IsDeleted') IS NULL
+                ALTER TABLE [dbo].[WorkItems] ADD [IsDeleted] bit NOT NULL CONSTRAINT [DF_WorkItems_IsDeleted] DEFAULT 0;
+            IF COL_LENGTH(N'[dbo].[WorkItems]', N'DeletedAt') IS NULL
+                ALTER TABLE [dbo].[WorkItems] ADD [DeletedAt] datetime2 NULL;
             """);
 
         database.Database.ExecuteSqlRaw("""
@@ -46,6 +55,8 @@ public static class DevelopmentSchemaUpdater
                     [Evidence] nvarchar(max) NOT NULL DEFAULT N'',
                     [Severity] nvarchar(10) NOT NULL,
                     [Status] nvarchar(20) NOT NULL,
+                    [IsDeleted] bit NOT NULL DEFAULT 0,
+                    [DeletedAt] datetime2 NULL,
                     [CreatedAt] datetime2 NOT NULL,
                     [UpdatedAt] datetime2 NOT NULL,
                     CONSTRAINT [FK_Problems_Cases_CaseId] FOREIGN KEY ([CaseId]) REFERENCES [dbo].[Cases]([Id]) ON DELETE CASCADE,
@@ -54,6 +65,13 @@ public static class DevelopmentSchemaUpdater
                 );
                 CREATE INDEX [IX_Problems_WorkItemId] ON [dbo].[Problems]([WorkItemId]);
             END
+            """);
+
+        database.Database.ExecuteSqlRaw("""
+            IF COL_LENGTH(N'[dbo].[Problems]', N'IsDeleted') IS NULL
+                ALTER TABLE [dbo].[Problems] ADD [IsDeleted] bit NOT NULL CONSTRAINT [DF_Problems_IsDeleted] DEFAULT 0;
+            IF COL_LENGTH(N'[dbo].[Problems]', N'DeletedAt') IS NULL
+                ALTER TABLE [dbo].[Problems] ADD [DeletedAt] datetime2 NULL;
             """);
 
         database.Database.ExecuteSqlRaw("""

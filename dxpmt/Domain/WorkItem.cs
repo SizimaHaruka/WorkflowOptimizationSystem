@@ -11,6 +11,8 @@ public sealed class WorkItem
     public string Performer { get; set; } = string.Empty;
     public string Location { get; set; } = string.Empty;
     public bool IsConfirmed { get; set; }
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
     public string ContentJson { get; set; } = "{}";
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }

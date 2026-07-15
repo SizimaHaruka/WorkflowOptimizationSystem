@@ -68,6 +68,22 @@ public sealed class GateModel(ApplicationDbContext database) : PageModel
             CreatedAt = now
         });
 
+        if (Input.Decision == GateDecisions.Returned)
+        {
+            var returnedGateIndex = Gates.Phase1.ToList().IndexOf(gate);
+            foreach (var laterGate in Gates.Phase1.Skip(returnedGateIndex + 1))
+            {
+                var latest = await database.GateReviews.Where(x => x.CaseId == caseId && x.Gate == laterGate)
+                    .OrderByDescending(x => x.CreatedAt).FirstOrDefaultAsync();
+                if (latest?.Decision == GateDecisions.Approved)
+                {
+                    database.GateReviews.Add(new GateReview { CaseId = caseId, Gate = laterGate, Decision = GateDecisions.Returned,
+                        ReviewerName = Input.ReviewerName.Trim(), ReviewedOn = Input.ReviewedOn,
+                        Comment = $"{gate} の差戻しに伴う自動差戻し。", ChecklistJson = "{}", CreatedAt = now });
+                }
+            }
+        }
+
         var targetStatus = Input.Decision switch
         {
             GateDecisions.Approved when gate == Gates.G0 => CaseStatuses.Investigating,

@@ -22,4 +22,13 @@ public sealed class IndexModel(ApplicationDbContext database) : PageModel
         Records = await database.DecisionRecords.AsNoTracking().Where(x => x.CaseId == CaseId).OrderByDescending(x => x.DecidedOn).ThenByDescending(x => x.Sequence).ToListAsync();
         return Page();
     }
+
+    public async Task<IActionResult> OnPostDeleteAsync(int id)
+    {
+        var record = await database.DecisionRecords.SingleOrDefaultAsync(x => x.Id == id && x.CaseId == CaseId);
+        if (record is null) return NotFound();
+        database.DecisionRecords.Remove(record);
+        await database.SaveChangesAsync();
+        return RedirectToPage(new { CaseId });
+    }
 }

@@ -15,6 +15,8 @@ public sealed class Problem
     public string Evidence { get; set; } = string.Empty;
     public string Severity { get; set; } = CasePriorities.Medium;
     public string Status { get; set; } = ProblemStatuses.Confirming;
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public ImprovementCase Case { get; set; } = null!;
