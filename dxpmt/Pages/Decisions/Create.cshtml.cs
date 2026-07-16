@@ -1,13 +1,14 @@
 using System.ComponentModel.DataAnnotations;
 using dxpmt.Data;
 using dxpmt.Domain;
+using dxpmt.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 namespace dxpmt.Pages.Decisions;
 
-public sealed class CreateModel(ApplicationDbContext database) : PageModel
+public sealed class CreateModel(ApplicationDbContext database, CurrentUserService currentUser) : PageModel
 {
     [BindProperty]
     public DecisionInput Input { get; set; } = new();
@@ -18,14 +19,19 @@ public sealed class CreateModel(ApplicationDbContext database) : PageModel
     {
         if (!await LoadCaseAsync(caseId)) return NotFound();
         Input.DecidedOn = DateOnly.FromDateTime(DateTime.Today);
-        Input.DeciderName = Case.OwnerName;
-        Input.CreatedBy = Case.OwnerName;
+        Input.DeciderName = currentUser.DisplayName;
+        Input.CreatedBy = currentUser.DisplayName;
+        Input.ApprovedBy = currentUser.DisplayName;
         return Page();
     }
 
     public async Task<IActionResult> OnPostAsync(int caseId)
     {
         if (!await LoadCaseAsync(caseId)) return NotFound();
+        Input.CreatedBy = currentUser.DisplayName;
+        Input.ApprovedBy = currentUser.DisplayName;
+        ModelState.Remove("Input.CreatedBy");
+        ModelState.Remove("Input.ApprovedBy");
         if (!ModelState.IsValid) return Page();
 
         var sequence = (await database.DecisionRecords.Where(x => x.CaseId == caseId).MaxAsync(x => (int?)x.Sequence) ?? 0) + 1;
@@ -39,7 +45,7 @@ public sealed class CreateModel(ApplicationDbContext database) : PageModel
             RejectedAlternatives = Input.RejectedAlternatives?.Trim() ?? string.Empty, References = Input.References?.Trim() ?? string.Empty,
             Impact = Input.Impact?.Trim() ?? string.Empty, FollowUpActions = Input.FollowUpActions?.Trim() ?? string.Empty,
             OwnerName = Input.OwnerName?.Trim() ?? string.Empty, DueDate = Input.DueDate, ReviewCondition = Input.ReviewCondition?.Trim() ?? string.Empty,
-            CreatedBy = Input.CreatedBy?.Trim() ?? string.Empty, ConfirmedBy = Input.ConfirmedBy?.Trim() ?? string.Empty, ApprovedBy = Input.ApprovedBy?.Trim() ?? string.Empty,
+            CreatedBy = currentUser.DisplayName, ConfirmedBy = Input.ConfirmedBy?.Trim() ?? string.Empty, ApprovedBy = currentUser.DisplayName,
             CreatedAt = now
         });
         Case.UpdatedAt = now;

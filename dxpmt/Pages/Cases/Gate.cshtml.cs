@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace dxpmt.Pages.Cases;
 
-public sealed class GateModel(ApplicationDbContext database) : PageModel
+public sealed class GateModel(ApplicationDbContext database, CurrentUserService currentUser) : PageModel
 {
     [BindProperty]
     public GateReviewInput Input { get; set; } = new();
@@ -17,13 +17,14 @@ public sealed class GateModel(ApplicationDbContext database) : PageModel
     public ImprovementCase Case { get; private set; } = null!;
     public string Gate { get; private set; } = string.Empty;
     public string GateName => Gates.GetName(Gate);
+    public string ReviewerName => currentUser.DisplayName;
 
     public async Task<IActionResult> OnGetAsync(int caseId, string gate)
     {
         if (!Gates.All.Contains(gate) || !await LoadCaseAsync(caseId)) return NotFound();
         Gate = gate;
         Input.ReviewedOn = DateOnly.FromDateTime(DateTime.Today);
-        Input.ReviewerName = Case.OwnerName;
+        Input.ReviewerName = ReviewerName;
         Input.Decision = GateDecisions.Approved;
         await SetSuggestedChecklistAsync();
         return Page();
@@ -33,6 +34,8 @@ public sealed class GateModel(ApplicationDbContext database) : PageModel
     {
         if (!Gates.All.Contains(gate) || !await LoadCaseAsync(caseId)) return NotFound();
         Gate = gate;
+        Input.ReviewerName = ReviewerName;
+        ModelState.Remove("Input.ReviewerName");
         if (Input.Decision is not GateDecisions.Approved and not GateDecisions.Returned)
         {
             ModelState.AddModelError("Input.Decision", "承認または差戻しを選択してください。");
@@ -61,7 +64,7 @@ public sealed class GateModel(ApplicationDbContext database) : PageModel
             CaseId = caseId,
             Gate = gate,
             Decision = Input.Decision,
-            ReviewerName = Input.ReviewerName.Trim(),
+            ReviewerName = ReviewerName,
             ReviewedOn = Input.ReviewedOn,
             Comment = Input.Comment?.Trim() ?? string.Empty,
             ChecklistJson = JsonSerializer.Serialize(Input.ChecklistFor(gate)),
@@ -83,7 +86,7 @@ public sealed class GateModel(ApplicationDbContext database) : PageModel
                 if (latest?.Decision == GateDecisions.Approved)
                 {
                     database.GateReviews.Add(new GateReview { CaseId = caseId, Gate = laterGate, Decision = GateDecisions.Returned,
-                        ReviewerName = Input.ReviewerName.Trim(), ReviewedOn = Input.ReviewedOn,
+                        ReviewerName = ReviewerName, ReviewedOn = Input.ReviewedOn,
                         Comment = $"{gate} の差戻しに伴う自動差戻し。", ChecklistJson = "{}", CreatedAt = now });
                 }
             }
@@ -108,7 +111,7 @@ public sealed class GateModel(ApplicationDbContext database) : PageModel
                 CaseId = caseId,
                 PreviousStatus = Case.Status,
                 NewStatus = targetStatus,
-                ChangedBy = Input.ReviewerName.Trim(),
+                ChangedBy = ReviewerName,
                 Comment = $"{GateName}: {Input.Decision}。{Input.Comment?.Trim()}",
                 ChangedAt = now
             });

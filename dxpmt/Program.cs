@@ -17,6 +17,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.Configure<DxpmtAuthenticationOptions>(builder.Configuration.GetSection(DxpmtAuthenticationOptions.SectionName));
 builder.Services.Configure<GhauthOptions>(builder.Configuration.GetSection(GhauthOptions.SectionName));
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<CurrentUserService>();
 builder.Services.AddScoped<GhauthUserService>();
 builder.Services.AddScoped<ActiveDirectoryUserPrincipalNameResolver>();
 var authentication = builder.Configuration.GetSection(DxpmtAuthenticationOptions.SectionName).Get<DxpmtAuthenticationOptions>() ?? new();

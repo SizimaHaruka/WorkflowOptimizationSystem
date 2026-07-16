@@ -196,8 +196,8 @@
                 </div>
                 <div class="mb-3">
                     <label asp-for="StatusChange.ChangedBy" class="form-label"></label>
-                    <input asp-for="StatusChange.ChangedBy" class="form-control" />
-                    <span asp-validation-for="StatusChange.ChangedBy" class="text-danger small"></span>
+                    <input asp-for="StatusChange.ChangedBy" class="form-control" readonly />
+                    <div class="form-text">ログインユーザーを自動記録します。</div>
                 </div>
                 <div class="mb-3">
                     <label asp-for="StatusChange.Comment" class="form-label"></label>

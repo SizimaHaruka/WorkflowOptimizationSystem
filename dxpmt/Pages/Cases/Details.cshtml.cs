@@ -2,13 +2,14 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using dxpmt.Data;
 using dxpmt.Domain;
+using dxpmt.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 namespace dxpmt.Pages.Cases;
 
-public sealed class DetailsModel(ApplicationDbContext database) : PageModel
+public sealed class DetailsModel(ApplicationDbContext database, CurrentUserService currentUser) : PageModel
 {
     public ImprovementCase Case { get; private set; } = null!;
     public int ImprovementOptionCount { get; private set; }
@@ -25,6 +26,7 @@ public sealed class DetailsModel(ApplicationDbContext database) : PageModel
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
+        StatusChange.ChangedBy = currentUser.DisplayName;
         return await LoadCaseAsync(id) ? Page() : NotFound();
     }
 
@@ -86,6 +88,8 @@ public sealed class DetailsModel(ApplicationDbContext database) : PageModel
 
     public async Task<IActionResult> OnPostChangeStatusAsync(int id)
     {
+        StatusChange.ChangedBy = currentUser.DisplayName;
+        ModelState.Remove("StatusChange.ChangedBy");
         if (!CaseStatuses.All.Contains(StatusChange.NewStatus))
         {
             ModelState.AddModelError("StatusChange.NewStatus", "有効なステータスを選択してください。");
@@ -114,7 +118,7 @@ public sealed class DetailsModel(ApplicationDbContext database) : PageModel
             CaseId = id,
             PreviousStatus = item.Status,
             NewStatus = StatusChange.NewStatus,
-            ChangedBy = StatusChange.ChangedBy.Trim(),
+            ChangedBy = currentUser.DisplayName,
             Comment = StatusChange.Comment?.Trim() ?? string.Empty,
             ChangedAt = now
         });

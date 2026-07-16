@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace dxpmt.Pages.Cases;
 
-public sealed class CreateModel(ApplicationDbContext database) : PageModel
+public sealed class CreateModel(ApplicationDbContext database, CurrentUserService currentUser) : PageModel
 {
     [BindProperty]
     public CaseInput Input { get; set; } = new();
@@ -61,7 +61,7 @@ public sealed class CreateModel(ApplicationDbContext database) : PageModel
             Case = item,
             PreviousStatus = string.Empty,
             NewStatus = CaseStatuses.Received,
-            ChangedBy = Input.OwnerName.Trim(),
+            ChangedBy = currentUser.DisplayName,
             Comment = "案件を登録しました。",
             ChangedAt = now
         });
