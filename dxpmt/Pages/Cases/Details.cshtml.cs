@@ -11,6 +11,9 @@ namespace dxpmt.Pages.Cases;
 public sealed class DetailsModel(ApplicationDbContext database) : PageModel
 {
     public ImprovementCase Case { get; private set; } = null!;
+    public int ImprovementOptionCount { get; private set; }
+    public int ToBeWorkItemCount { get; private set; }
+    public int RequirementCount { get; private set; }
 
     [BindProperty]
     public StatusChangeInput StatusChange { get; set; } = new();
@@ -139,6 +142,9 @@ public sealed class DetailsModel(ApplicationDbContext database) : PageModel
         }
 
         Case = item;
+        ImprovementOptionCount = await database.ImprovementOptions.CountAsync(x => x.CaseId == id);
+        ToBeWorkItemCount = await database.WorkItems.CountAsync(x => x.CaseId == id && x.WorkType == WorkItemTypes.ToBe && !x.IsDeleted);
+        RequirementCount = await database.Requirements.CountAsync(x => x.CaseId == id);
         return true;
     }
 
