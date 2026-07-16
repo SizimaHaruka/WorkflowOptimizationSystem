@@ -13,6 +13,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     public DbSet<CaseStatusHistory> CaseStatusHistories => Set<CaseStatusHistory>();
     public DbSet<WorkItem> WorkItems => Set<WorkItem>();
     public DbSet<Problem> Problems => Set<Problem>();
+    public DbSet<ImprovementOption> ImprovementOptions => Set<ImprovementOption>();
     public DbSet<TraceLink> TraceLinks => Set<TraceLink>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -86,6 +87,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
         modelBuilder.Entity<WorkItem>(entity =>
         {
             entity.HasIndex(x => new { x.CaseId, x.Sequence }).IsUnique();
+            entity.Property(x => x.WorkType).HasMaxLength(10).IsRequired().HasDefaultValue(WorkItemTypes.AsIs);
             entity.Property(x => x.BusinessProcessName).HasMaxLength(200);
             entity.Property(x => x.Name).HasMaxLength(200).IsRequired();
             entity.Property(x => x.DepartmentAndRole).HasMaxLength(200);
@@ -112,6 +114,16 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
             entity.Property(x => x.SourceType).HasMaxLength(30).IsRequired();
             entity.Property(x => x.TargetType).HasMaxLength(30).IsRequired();
             entity.HasOne(x => x.Case).WithMany(x => x.TraceLinks).HasForeignKey(x => x.CaseId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<ImprovementOption>(entity =>
+        {
+            entity.HasIndex(x => new { x.CaseId, x.Sequence }).IsUnique();
+            entity.Property(x => x.Title).HasMaxLength(200).IsRequired();
+            entity.Property(x => x.Recommendation).HasMaxLength(20).IsRequired();
+            entity.Property(x => x.Status).HasMaxLength(20).IsRequired();
+            entity.HasOne(x => x.Case).WithMany().HasForeignKey(x => x.CaseId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(x => x.Problem).WithMany().HasForeignKey(x => x.ProblemId).OnDelete(DeleteBehavior.NoAction);
         });
     }
 }

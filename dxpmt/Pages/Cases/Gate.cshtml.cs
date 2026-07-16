@@ -144,7 +144,7 @@ public sealed class GateModel(ApplicationDbContext database) : PageModel
         {
             var flow = await database.CaseForms.SingleOrDefaultAsync(x => x.CaseId == Case.Id && x.FormType == FormTypes.AsIsFlow && x.Version == 1);
             var content = Deserialize<AsIsFlowFormModel>(flow?.ContentJson);
-            var workItems = await database.WorkItems.Where(x => x.CaseId == Case.Id).ToListAsync();
+            var workItems = await database.WorkItems.Where(x => x.CaseId == Case.Id && x.WorkType == WorkItemTypes.AsIs && !x.IsDeleted).ToListAsync();
             Input.WorkItemsAreConfirmed = workItems.Count > 0 && workItems.All(x => x.IsConfirmed);
             Input.FlowIsConnected = content?.IsConnectedEndToEnd == true;
             Input.InputsOutputsAreConfirmed = content?.AreInputsOutputsConnected == true;

@@ -1,0 +1,18 @@
+@page
+@model dxpmt.Pages.ImprovementOptions.CreateModel
+@{ ViewData["Title"] = "F06 改善案を追加"; }
+
+<div class="page-heading d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4"><div><p class="eyebrow">@Model.Case.CaseNumber / F06</p><h1>改善案を追加</h1><p class="text-muted mb-0">対象問題を選ぶと、問題から改善案への追跡関係も記録します。</p></div><a class="btn btn-outline-secondary" asp-page="Index" asp-route-caseId="@Model.Case.Id">一覧へ戻る</a></div>
+<form method="post" class="form-card"><input type="hidden" name="caseId" value="@Model.Case.Id" /><div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="row g-3">
+        <div class="col-md-6"><label asp-for="Input.ProblemId" class="form-label"></label><select asp-for="Input.ProblemId" class="form-select"><option value="">横断・未紐付け</option>@foreach (var problem in Model.Problems) { <option value="@problem.Id">@problem.Sequence. @problem.Phenomenon</option> }</select></div>
+        <div class="col-md-6"><label asp-for="Input.Title" class="form-label"></label><input asp-for="Input.Title" class="form-control" /><span asp-validation-for="Input.Title" class="text-danger"></span></div>
+        <div class="col-12"><label asp-for="Input.Approach" class="form-label"></label><textarea asp-for="Input.Approach" class="form-control" rows="3"></textarea><span asp-validation-for="Input.Approach" class="text-danger"></span></div>
+        <div class="col-md-4"><label asp-for="Input.ExpectedEffect" class="form-label"></label><textarea asp-for="Input.ExpectedEffect" class="form-control" rows="3"></textarea><span asp-validation-for="Input.ExpectedEffect" class="text-danger"></span></div>
+        <div class="col-md-4"><label asp-for="Input.CostAndEffort" class="form-label"></label><textarea asp-for="Input.CostAndEffort" class="form-control" rows="3"></textarea></div>
+        <div class="col-md-4"><label asp-for="Input.RisksAndConstraints" class="form-label"></label><textarea asp-for="Input.RisksAndConstraints" class="form-control" rows="3"></textarea></div>
+        <div class="col-md-6"><label asp-for="Input.Recommendation" class="form-label"></label><select asp-for="Input.Recommendation" class="form-select">@foreach (var value in Model.Recommendations) { <option value="@value">@value</option> }</select></div>
+        <div class="col-md-6"><label asp-for="Input.Status" class="form-label"></label><select asp-for="Input.Status" class="form-select">@foreach (var value in Model.Statuses) { <option value="@value">@value</option> }</select></div>
+        <div class="col-12"><label asp-for="Input.Evidence" class="form-label"></label><textarea asp-for="Input.Evidence" class="form-control" rows="3"></textarea></div>
+    </div><div class="form-actions"><a class="btn btn-outline-secondary" asp-page="Index" asp-route-caseId="@Model.Case.Id">キャンセル</a><button class="btn btn-primary" type="submit">保存</button></div>
+</form>

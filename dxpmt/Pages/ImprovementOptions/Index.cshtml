@@ -1,0 +1,22 @@
+@page
+@model dxpmt.Pages.ImprovementOptions.IndexModel
+@{ ViewData["Title"] = "F06 改善案評価票"; }
+
+<div class="page-heading d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+    <div><p class="eyebrow">@Model.Case.CaseNumber / F06</p><h1>改善案評価票</h1><p class="text-muted mb-0">問題に対する複数の改善案を、効果・負荷・リスクで比較します。</p></div>
+    <div class="d-flex gap-2"><a class="btn btn-outline-secondary" asp-page="/Cases/Details" asp-route-id="@Model.CaseId">案件詳細</a><a class="btn btn-primary" asp-page="Create" asp-route-caseId="@Model.CaseId">改善案を追加</a></div>
+</div>
+
+@if (!Model.Items.Any())
+{
+    <div class="empty-state"><p class="mb-2">まだ改善案はありません。</p><a class="btn btn-primary" asp-page="Create" asp-route-caseId="@Model.CaseId">最初の改善案を登録</a></div>
+}
+else
+{
+    <div class="table-responsive form-card p-0"><table class="table table-hover align-middle mb-0"><thead><tr><th>No.</th><th>改善案</th><th>対象問題</th><th>期待効果</th><th>推奨度</th><th>状態</th></tr></thead><tbody>
+    @foreach (var item in Model.Items)
+    {
+        <tr><td>@item.Sequence</td><td><strong>@item.Title</strong><br /><small class="text-muted">@item.Approach</small></td><td>@(item.Problem?.Phenomenon ?? "横断・未紐付け")</td><td>@item.ExpectedEffect</td><td><span class="badge text-bg-light">@item.Recommendation</span></td><td>@item.Status</td></tr>
+    }
+    </tbody></table></div>
+}
