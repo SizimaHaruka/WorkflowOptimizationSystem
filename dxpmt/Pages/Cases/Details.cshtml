@@ -126,6 +126,28 @@
         </section>
 
         <section class="panel">
+            <div class="panel-heading"><h2>帳票版履歴</h2></div>
+            @if (!Model.Case.Forms.Any())
+            {
+                <p class="empty-state">保存済みの帳票はありません。</p>
+            }
+            else
+            {
+                <div class="table-responsive mb-4">
+                    <table class="table app-table mb-0">
+                        <thead><tr><th>帳票</th><th>版</th><th>状態</th><th>更新日時</th></tr></thead>
+                        <tbody>
+                        @foreach (var form in Model.Case.Forms.OrderBy(x => x.FormType).ThenByDescending(x => x.Version))
+                        {
+                            <tr><td>@form.FormType</td><td>第@form.Version 版</td><td>@form.Status</td><td>@form.UpdatedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm")</td></tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </section>
+
+        <section class="panel">
             <div class="panel-heading"><h2>ステータス履歴</h2></div>
             @if (Model.Case.StatusHistory.Count == 0)
             {
