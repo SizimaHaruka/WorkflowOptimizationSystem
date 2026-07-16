@@ -14,6 +14,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     public DbSet<WorkItem> WorkItems => Set<WorkItem>();
     public DbSet<Problem> Problems => Set<Problem>();
     public DbSet<ImprovementOption> ImprovementOptions => Set<ImprovementOption>();
+    public DbSet<Requirement> Requirements => Set<Requirement>();
     public DbSet<TraceLink> TraceLinks => Set<TraceLink>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -124,6 +125,16 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
             entity.Property(x => x.Status).HasMaxLength(20).IsRequired();
             entity.HasOne(x => x.Case).WithMany().HasForeignKey(x => x.CaseId).OnDelete(DeleteBehavior.Cascade);
             entity.HasOne(x => x.Problem).WithMany().HasForeignKey(x => x.ProblemId).OnDelete(DeleteBehavior.NoAction);
+        });
+        modelBuilder.Entity<Requirement>(entity =>
+        {
+            entity.HasIndex(x => new { x.CaseId, x.Sequence }).IsUnique();
+            entity.Property(x => x.Category).HasMaxLength(20).IsRequired();
+            entity.Property(x => x.Title).HasMaxLength(200).IsRequired();
+            entity.Property(x => x.Priority).HasMaxLength(10).IsRequired();
+            entity.Property(x => x.Status).HasMaxLength(20).IsRequired();
+            entity.HasOne(x => x.Case).WithMany().HasForeignKey(x => x.CaseId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(x => x.WorkItem).WithMany().HasForeignKey(x => x.WorkItemId).OnDelete(DeleteBehavior.NoAction);
         });
     }
 }

@@ -17,4 +17,5 @@ public static class TraceLinkTypes
     public const string WorkItem = "WorkItem";
     public const string Problem = "Problem";
     public const string ImprovementOption = "ImprovementOption";
+    public const string Requirement = "Requirement";
 }
