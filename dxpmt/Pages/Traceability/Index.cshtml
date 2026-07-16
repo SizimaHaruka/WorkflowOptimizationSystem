@@ -1,0 +1,5 @@
+@page
+@model dxpmt.Pages.Traceability.IndexModel
+@{ViewData["Title"]="追跡ビュー";}
+<div class="page-heading d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4"><div><p class="eyebrow">@Model.Case.CaseNumber</p><h1>追跡ビュー</h1><p class="text-muted mb-0">作業・問題・改善案・要求事項の関係を確認します。</p></div><a class="btn btn-outline-secondary" asp-page="/Cases/Details" asp-route-id="@Model.CaseId">案件詳細へ戻る</a></div>
+@if(!Model.Rows.Any()){<div class="empty-state">追跡リンクはまだありません。F05〜F08で対象を紐付けると表示されます。</div>}else{<div class="table-responsive form-card p-0"><table class="table table-hover mb-0"><thead><tr><th>起点種別</th><th>起点</th><th></th><th>関連種別</th><th>関連先</th><th>記録日時</th></tr></thead><tbody>@foreach(var row in Model.Rows){<tr><td>@row.SourceType</td><td>@row.SourceName</td><td>→</td><td>@row.TargetType</td><td>@row.TargetName</td><td>@row.CreatedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm")</td></tr>}</tbody></table></div>}

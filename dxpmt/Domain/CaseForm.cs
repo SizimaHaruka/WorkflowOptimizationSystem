@@ -20,6 +20,7 @@ public static class FormTypes
     public const string Reception = "F01";
     public const string SurveyPlan = "F02";
     public const string AsIsFlow = "F04";
+    public const string EffectConfirmation = "F09";
 }
 
 public static class FormStatuses

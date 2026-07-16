@@ -20,7 +20,7 @@ public sealed class GateModel(ApplicationDbContext database) : PageModel
 
     public async Task<IActionResult> OnGetAsync(int caseId, string gate)
     {
-        if (!Gates.Phase1.Contains(gate) || !await LoadCaseAsync(caseId)) return NotFound();
+        if (!Gates.All.Contains(gate) || !await LoadCaseAsync(caseId)) return NotFound();
         Gate = gate;
         Input.ReviewedOn = DateOnly.FromDateTime(DateTime.Today);
         Input.ReviewerName = Case.OwnerName;
@@ -31,7 +31,7 @@ public sealed class GateModel(ApplicationDbContext database) : PageModel
 
     public async Task<IActionResult> OnPostAsync(int caseId, string gate)
     {
-        if (!Gates.Phase1.Contains(gate) || !await LoadCaseAsync(caseId)) return NotFound();
+        if (!Gates.All.Contains(gate) || !await LoadCaseAsync(caseId)) return NotFound();
         Gate = gate;
         if (Input.Decision is not GateDecisions.Approved and not GateDecisions.Returned)
         {
@@ -43,9 +43,9 @@ public sealed class GateModel(ApplicationDbContext database) : PageModel
             ModelState.AddModelError(string.Empty, "承認するには、すべての完了条件を確認してください。");
         }
 
-        if (gate is Gates.G1 or Gates.G2 && Input.Decision == GateDecisions.Approved)
+        if (gate != Gates.G0 && Input.Decision == GateDecisions.Approved)
         {
-            var priorGate = gate == Gates.G1 ? Gates.G0 : Gates.G1;
+            var priorGate = Gates.All[Gates.All.ToList().IndexOf(gate) - 1];
             var priorApproved = await database.GateReviews.AnyAsync(x => x.CaseId == caseId && x.Gate == priorGate && x.Decision == GateDecisions.Approved);
             if (!priorApproved)
             {
@@ -70,8 +70,8 @@ public sealed class GateModel(ApplicationDbContext database) : PageModel
 
         if (Input.Decision == GateDecisions.Returned)
         {
-            var returnedGateIndex = Gates.Phase1.ToList().IndexOf(gate);
-            foreach (var laterGate in Gates.Phase1.Skip(returnedGateIndex + 1))
+            var returnedGateIndex = Gates.All.ToList().IndexOf(gate);
+            foreach (var laterGate in Gates.All.Skip(returnedGateIndex + 1))
             {
                 var latest = await database.GateReviews.Where(x => x.CaseId == caseId && x.Gate == laterGate)
                     .OrderByDescending(x => x.CreatedAt).FirstOrDefaultAsync();
@@ -89,6 +89,10 @@ public sealed class GateModel(ApplicationDbContext database) : PageModel
             GateDecisions.Approved when gate == Gates.G0 => CaseStatuses.Investigating,
             GateDecisions.Approved when gate == Gates.G1 => CaseStatuses.AsIsReview,
             GateDecisions.Approved when gate == Gates.G2 => CaseStatuses.ImprovementReview,
+            GateDecisions.Approved when gate == Gates.G3 => CaseStatuses.ToBeReview,
+            GateDecisions.Approved when gate == Gates.G4 => CaseStatuses.ImplementationDecision,
+            GateDecisions.Approved when gate == Gates.G5 => CaseStatuses.Implementing,
+            GateDecisions.Approved when gate == Gates.G6 => CaseStatuses.Completed,
             GateDecisions.Returned => CaseStatuses.Returned,
             _ => Case.Status
         };
@@ -140,7 +144,7 @@ public sealed class GateModel(ApplicationDbContext database) : PageModel
             Input.TargetDepartmentsAreAgreed = !string.IsNullOrWhiteSpace(content?.TargetSitesAndDepartments);
             Input.ExcludedScopeIsAgreed = !string.IsNullOrWhiteSpace(content?.ExcludedScope);
         }
-        else
+        else if (Gate == Gates.G2)
         {
             var flow = await database.CaseForms.SingleOrDefaultAsync(x => x.CaseId == Case.Id && x.FormType == FormTypes.AsIsFlow && x.Version == 1);
             var content = Deserialize<AsIsFlowFormModel>(flow?.ContentJson);
@@ -150,6 +154,18 @@ public sealed class GateModel(ApplicationDbContext database) : PageModel
             Input.InputsOutputsAreConfirmed = content?.AreInputsOutputsConnected == true;
             Input.JudgementsAreConfirmed = content?.AreJudgementCriteriaConfirmed == true;
             Input.ExceptionsAreIncluded = content?.AreExceptionsIncluded == true;
+        }
+        else
+        {
+            var options = await database.ImprovementOptions.CountAsync(x => x.CaseId == Case.Id);
+            var toBe = await database.WorkItems.CountAsync(x => x.CaseId == Case.Id && x.WorkType == WorkItemTypes.ToBe && !x.IsDeleted);
+            var requirements = await database.Requirements.CountAsync(x => x.CaseId == Case.Id);
+            var effectFormExists = await database.CaseForms.AnyAsync(x => x.CaseId == Case.Id && x.FormType == FormTypes.EffectConfirmation);
+            Input.WorkItemsAreConfirmed = Gate == Gates.G3 ? options > 0 : Gate == Gates.G6 ? effectFormExists : toBe > 0;
+            Input.FlowIsConnected = Gate is Gates.G5 or Gates.G6 ? requirements > 0 : true;
+            Input.InputsOutputsAreConfirmed = true;
+            Input.JudgementsAreConfirmed = true;
+            Input.ExceptionsAreIncluded = true;
         }
     }
 
