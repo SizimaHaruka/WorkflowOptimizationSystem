@@ -28,19 +28,15 @@
             <small>未完了の課題・宿題</small>
         </div>
     </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="summary-card">
-            <span>G0 判断待ち</span>
-            <strong>@Model.G0PendingCount</strong>
-            <small>調査着手前の案件</small>
-        </div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="summary-card">
-            <span>G1 判断待ち</span>
-            <strong>@Model.G1PendingCount</strong>
-            <small>範囲確定前の案件</small>
-        </div>
+</section>
+
+<section class="panel mb-4">
+    <div class="panel-heading"><h2>ゲート判断待ち</h2><span class="text-muted small">前提ゲートが承認済みの案件</span></div>
+    <div class="status-count-list">
+        @foreach (var item in Model.GatePendingCounts)
+        {
+            <div class="status-count-row"><span>@item.GateName</span><strong>@item.Count 件</strong></div>
+        }
     </div>
 </section>
 
