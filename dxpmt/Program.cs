@@ -46,7 +46,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
+app.MapStaticAssets().AllowAnonymous();
 app.MapRazorPages()
    .WithStaticAssets();
 

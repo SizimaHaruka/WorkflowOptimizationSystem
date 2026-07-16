@@ -20,7 +20,17 @@ public sealed class LoginModel(
     [BindProperty] public InputModel Input { get; set; } = new();
     public bool WindowsEnabled => options.Value.WindowsAuthenticationEnabled;
 
-    public IActionResult OnGet(string? returnUrl = null) => User.Identity?.IsAuthenticated == true ? LocalRedirect(returnUrl ?? "/") : Page();
+    public IActionResult OnGet(string? returnUrl = null, bool showLogin = false)
+    {
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            return LocalRedirect(returnUrl ?? "/");
+        }
+
+        return WindowsEnabled && !showLogin
+            ? RedirectToPage("Login", "WindowsCallback", new { returnUrl, attempted = false })
+            : Page();
+    }
 
     public IActionResult OnPostWindows(string? returnUrl = null) => WindowsEnabled
         ? RedirectToPage("Login", "WindowsCallback", new { returnUrl, attempted = false })

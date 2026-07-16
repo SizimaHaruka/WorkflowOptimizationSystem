@@ -28,10 +28,6 @@
                         <span class="navbar-text">@User.Identity.Name</span>
                         <form method="post" asp-page="/Auth/Logout" class="d-inline"><button class="btn btn-outline-light btn-sm ms-2">ログアウト</button></form>
                     }
-                    else
-                    {
-                        <a class="btn btn-outline-light btn-sm" asp-page="/Auth/Login">ログイン</a>
-                    }
                 </div>
             </div>
         </nav>
