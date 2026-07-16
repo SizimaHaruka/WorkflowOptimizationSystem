@@ -4,6 +4,8 @@
     ViewData["Title"] = Model.Case.CaseNumber;
     var f01 = Model.Case.Forms.SingleOrDefault(x => x.FormType == FormTypes.Reception);
     var f02 = Model.Case.Forms.SingleOrDefault(x => x.FormType == FormTypes.SurveyPlan);
+    var f04 = Model.Case.Forms.SingleOrDefault(x => x.FormType == FormTypes.AsIsFlow);
+    var f09 = Model.Case.Forms.SingleOrDefault(x => x.FormType == FormTypes.EffectConfirmation);
     var g0 = Model.Case.GateReviews.Where(x => x.Gate == Gates.G0).OrderByDescending(x => x.CreatedAt).FirstOrDefault();
     var g1 = Model.Case.GateReviews.Where(x => x.Gate == Gates.G1).OrderByDescending(x => x.CreatedAt).FirstOrDefault();
     var g2 = Model.Case.GateReviews.Where(x => x.Gate == Gates.G2).OrderByDescending(x => x.CreatedAt).FirstOrDefault();
@@ -69,12 +71,12 @@
             <div class="panel-heading"><h2>As-Is調査・問題分析</h2></div>
             <div class="workflow-links">
                 <a class="workflow-link" asp-page="/WorkItems/Index" asp-route-caseId="@Model.Case.Id"><span class="workflow-code">F03</span><span><strong>作業ヒアリング票</strong><small>作業単位で実態を記録</small></span><span>→</span></a>
-                <a class="workflow-link" asp-page="/Forms/F04" asp-route-caseId="@Model.Case.Id"><span class="workflow-code">F04</span><span><strong>業務フロー整理票</strong><small>作業をつなげて確認</small></span><span>→</span></a>
+                <a class="workflow-link" asp-page="/Forms/F04" asp-route-caseId="@Model.Case.Id"><span class="workflow-code">F04</span><span><strong>業務フロー整理票</strong><small>@(f04?.Status ?? "未作成") / 最終更新: @(f04?.UpdatedAt.ToString("yyyy/MM/dd HH:mm") ?? "—")</small></span><span>→</span></a>
                 <a class="workflow-link" asp-page="/Problems/Index" asp-route-caseId="@Model.Case.Id"><span class="workflow-code">F05</span><span><strong>問題・課題一覧</strong><small>作業に紐付けて分析</small></span><span>→</span></a>
                 <a class="workflow-link" asp-page="/ImprovementOptions/Index" asp-route-caseId="@Model.Case.Id"><span class="workflow-code">F06</span><span><strong>改善案評価票</strong><small>効果・負荷・リスクを比較</small></span><span>→</span></a>
                 <a class="workflow-link" asp-page="/ToBeWorkItems/Index" asp-route-caseId="@Model.Case.Id"><span class="workflow-code">F07</span><span><strong>To-Be作業定義票</strong><small>改善後の役割と作業を定義</small></span><span>→</span></a>
                 <a class="workflow-link" asp-page="/Requirements/Index" asp-route-caseId="@Model.Case.Id"><span class="workflow-code">F08</span><span><strong>要求事項一覧</strong><small>実現すべき要件と受入条件を整理</small></span><span>→</span></a>
-                <a class="workflow-link" asp-page="/Forms/F09" asp-route-caseId="@Model.Case.Id"><span class="workflow-code">F09</span><span><strong>効果確認票</strong><small>目標・実績・残課題を確認</small></span><span>→</span></a>
+                <a class="workflow-link" asp-page="/Forms/F09" asp-route-caseId="@Model.Case.Id"><span class="workflow-code">F09</span><span><strong>効果確認票</strong><small>@(f09?.Status ?? "未作成") / 最終更新: @(f09?.UpdatedAt.ToString("yyyy/MM/dd HH:mm") ?? "—")</small></span><span>→</span></a>
                 <a class="workflow-link" asp-page="/Traceability/Index" asp-route-caseId="@Model.Case.Id"><span class="workflow-code">追跡</span><span><strong>追跡ビュー</strong><small>作業から要求事項までの関係を確認</small></span><span>→</span></a>
             </div>
         </section>
