@@ -91,14 +91,14 @@
                     <a class="btn btn-outline-primary btn-sm" asp-page="/Cases/Gate" asp-route-caseId="@Model.Case.Id" asp-route-gate="G0">G0を判定</a>
                 </div>
                 <div class="gate-card">
-                    <div><span class="workflow-code">G2</span><strong>As-Is確定</strong></div>
-                    <p>@(g2 is null ? "未判定" : $"{g2.Decision} / {g2.ReviewerName} / {g2.ReviewedOn:yyyy/MM/dd}")</p>
-                    <a class="btn btn-outline-primary btn-sm" asp-page="/Cases/Gate" asp-route-caseId="@Model.Case.Id" asp-route-gate="G2">G2を判定</a>
-                </div>
-                <div class="gate-card">
                     <div><span class="workflow-code">G1</span><strong>範囲確定</strong></div>
                     <p>@(g1 is null ? "未判定" : $"{g1.Decision} / {g1.ReviewerName} / {g1.ReviewedOn:yyyy/MM/dd}")</p>
                     <a class="btn btn-outline-primary btn-sm" asp-page="/Cases/Gate" asp-route-caseId="@Model.Case.Id" asp-route-gate="G1">G1を判定</a>
+                </div>
+                <div class="gate-card">
+                    <div><span class="workflow-code">G2</span><strong>As-Is確定</strong></div>
+                    <p>@(g2 is null ? "未判定" : $"{g2.Decision} / {g2.ReviewerName} / {g2.ReviewedOn:yyyy/MM/dd}")</p>
+                    <a class="btn btn-outline-primary btn-sm" asp-page="/Cases/Gate" asp-route-caseId="@Model.Case.Id" asp-route-gate="G2">G2を判定</a>
                 </div>
                 <div class="gate-card">
                     <div><span class="workflow-code">G3</span><strong>改善案選定</strong></div>
