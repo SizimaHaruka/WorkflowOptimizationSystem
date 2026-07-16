@@ -32,12 +32,4 @@ app.MapStaticAssets();
 app.MapRazorPages()
    .WithStaticAssets();
 
-if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Database:InitializeOnStartup"))
-{
-    using var scope = app.Services.CreateScope();
-    var database = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    database.Database.EnsureCreated();
-    DevelopmentSchemaUpdater.Apply(database);
-}
-
 app.Run();
