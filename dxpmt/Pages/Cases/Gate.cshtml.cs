@@ -128,7 +128,7 @@ public sealed class GateModel(ApplicationDbContext database) : PageModel
     {
         if (Gate == Gates.G0)
         {
-            var form = await database.CaseForms.SingleOrDefaultAsync(x => x.CaseId == Case.Id && x.FormType == FormTypes.Reception && x.Version == 1);
+            var form = await database.CaseForms.Where(x => x.CaseId == Case.Id && x.FormType == FormTypes.Reception).OrderByDescending(x => x.Version).FirstOrDefaultAsync();
             var content = Deserialize<ReceptionFormModel>(form?.ContentJson);
             Input.ProblemIsClear = !string.IsNullOrWhiteSpace(content?.ProblemToSolve);
             Input.RequesterIsClear = !string.IsNullOrWhiteSpace(Case.RequesterName);
@@ -137,7 +137,7 @@ public sealed class GateModel(ApplicationDbContext database) : PageModel
         }
         else if (Gate == Gates.G1)
         {
-            var form = await database.CaseForms.SingleOrDefaultAsync(x => x.CaseId == Case.Id && x.FormType == FormTypes.SurveyPlan && x.Version == 1);
+            var form = await database.CaseForms.Where(x => x.CaseId == Case.Id && x.FormType == FormTypes.SurveyPlan).OrderByDescending(x => x.Version).FirstOrDefaultAsync();
             var content = Deserialize<SurveyPlanFormModel>(form?.ContentJson);
             Input.StartEventIsClear = !string.IsNullOrWhiteSpace(content?.StartEvent);
             Input.EndStateIsClear = !string.IsNullOrWhiteSpace(content?.EndStateAndDeliverable);
@@ -146,7 +146,7 @@ public sealed class GateModel(ApplicationDbContext database) : PageModel
         }
         else if (Gate == Gates.G2)
         {
-            var flow = await database.CaseForms.SingleOrDefaultAsync(x => x.CaseId == Case.Id && x.FormType == FormTypes.AsIsFlow && x.Version == 1);
+            var flow = await database.CaseForms.Where(x => x.CaseId == Case.Id && x.FormType == FormTypes.AsIsFlow).OrderByDescending(x => x.Version).FirstOrDefaultAsync();
             var content = Deserialize<AsIsFlowFormModel>(flow?.ContentJson);
             var workItems = await database.WorkItems.Where(x => x.CaseId == Case.Id && x.WorkType == WorkItemTypes.AsIs && !x.IsDeleted).ToListAsync();
             Input.WorkItemsAreConfirmed = workItems.Count > 0 && workItems.All(x => x.IsConfirmed);

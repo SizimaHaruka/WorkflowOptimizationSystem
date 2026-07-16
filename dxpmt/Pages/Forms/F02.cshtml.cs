@@ -25,7 +25,7 @@ public sealed class F02Model(ApplicationDbContext database) : PageModel
             return NotFound();
         }
 
-        var form = await database.CaseForms.SingleOrDefaultAsync(x => x.CaseId == caseId && x.FormType == FormTypes.SurveyPlan && x.Version == 1);
+        var form = await database.CaseForms.Where(x => x.CaseId == caseId && x.FormType == FormTypes.SurveyPlan).OrderByDescending(x => x.Version).FirstOrDefaultAsync();
         Input = Deserialize(form?.ContentJson) ?? new SurveyPlanFormModel { SurveyLead = Case.OwnerName };
         Input.EnsureRows();
         return Page();
@@ -45,7 +45,7 @@ public sealed class F02Model(ApplicationDbContext database) : PageModel
         }
 
         var now = DateTime.UtcNow;
-        var form = await database.CaseForms.SingleOrDefaultAsync(x => x.CaseId == caseId && x.FormType == FormTypes.SurveyPlan && x.Version == 1);
+        var form = await database.CaseForms.Where(x => x.CaseId == caseId && x.FormType == FormTypes.SurveyPlan).OrderByDescending(x => x.Version).FirstOrDefaultAsync();
         if (form is null)
         {
             form = new CaseForm { CaseId = caseId, FormType = FormTypes.SurveyPlan, Version = 1 };

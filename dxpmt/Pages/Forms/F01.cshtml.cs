@@ -25,7 +25,7 @@ public sealed class F01Model(ApplicationDbContext database) : PageModel
             return NotFound();
         }
 
-        var form = await database.CaseForms.SingleOrDefaultAsync(x => x.CaseId == caseId && x.FormType == FormTypes.Reception && x.Version == 1);
+        var form = await database.CaseForms.Where(x => x.CaseId == caseId && x.FormType == FormTypes.Reception).OrderByDescending(x => x.Version).FirstOrDefaultAsync();
         Input = Deserialize(form?.ContentJson) ?? new ReceptionFormModel { ScopeSummary = Case.ScopeSummary };
         return Page();
     }
@@ -43,7 +43,7 @@ public sealed class F01Model(ApplicationDbContext database) : PageModel
         }
 
         var now = DateTime.UtcNow;
-        var form = await database.CaseForms.SingleOrDefaultAsync(x => x.CaseId == caseId && x.FormType == FormTypes.Reception && x.Version == 1);
+        var form = await database.CaseForms.Where(x => x.CaseId == caseId && x.FormType == FormTypes.Reception).OrderByDescending(x => x.Version).FirstOrDefaultAsync();
         if (form is null)
         {
             form = new CaseForm { CaseId = caseId, FormType = FormTypes.Reception, Version = 1 };
