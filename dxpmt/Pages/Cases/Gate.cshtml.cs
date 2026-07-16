@@ -68,6 +68,11 @@ public sealed class GateModel(ApplicationDbContext database) : PageModel
             CreatedAt = now
         });
 
+        if (Input.Decision is GateDecisions.Approved or GateDecisions.Returned)
+        {
+            await CaptureFormVersionsAsync(caseId, now);
+        }
+
         if (Input.Decision == GateDecisions.Returned)
         {
             var returnedGateIndex = Gates.All.ToList().IndexOf(gate);
@@ -122,6 +127,29 @@ public sealed class GateModel(ApplicationDbContext database) : PageModel
         if (item is null) return false;
         Case = item;
         return true;
+    }
+
+    private async Task CaptureFormVersionsAsync(int caseId, DateTime now)
+    {
+        var currentForms = await database.CaseForms
+            .Where(x => x.CaseId == caseId)
+            .GroupBy(x => x.FormType)
+            .Select(group => group.OrderByDescending(x => x.Version).First())
+            .ToListAsync();
+
+        foreach (var form in currentForms)
+        {
+            form.Status = FormStatuses.Confirmed;
+            database.CaseForms.Add(new CaseForm
+            {
+                CaseId = form.CaseId,
+                FormType = form.FormType,
+                Version = form.Version + 1,
+                Status = FormStatuses.Draft,
+                ContentJson = form.ContentJson,
+                UpdatedAt = now
+            });
+        }
     }
 
     private async Task SetSuggestedChecklistAsync()

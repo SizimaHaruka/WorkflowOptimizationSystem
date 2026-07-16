@@ -2,10 +2,10 @@
 @model dxpmt.Pages.Cases.DetailsModel
 @{
     ViewData["Title"] = Model.Case.CaseNumber;
-    var f01 = Model.Case.Forms.SingleOrDefault(x => x.FormType == FormTypes.Reception);
-    var f02 = Model.Case.Forms.SingleOrDefault(x => x.FormType == FormTypes.SurveyPlan);
-    var f04 = Model.Case.Forms.SingleOrDefault(x => x.FormType == FormTypes.AsIsFlow);
-    var f09 = Model.Case.Forms.SingleOrDefault(x => x.FormType == FormTypes.EffectConfirmation);
+    var f01 = Model.Case.Forms.Where(x => x.FormType == FormTypes.Reception).OrderByDescending(x => x.Version).FirstOrDefault();
+    var f02 = Model.Case.Forms.Where(x => x.FormType == FormTypes.SurveyPlan).OrderByDescending(x => x.Version).FirstOrDefault();
+    var f04 = Model.Case.Forms.Where(x => x.FormType == FormTypes.AsIsFlow).OrderByDescending(x => x.Version).FirstOrDefault();
+    var f09 = Model.Case.Forms.Where(x => x.FormType == FormTypes.EffectConfirmation).OrderByDescending(x => x.Version).FirstOrDefault();
     var g0 = Model.Case.GateReviews.Where(x => x.Gate == Gates.G0).OrderByDescending(x => x.CreatedAt).FirstOrDefault();
     var g1 = Model.Case.GateReviews.Where(x => x.Gate == Gates.G1).OrderByDescending(x => x.CreatedAt).FirstOrDefault();
     var g2 = Model.Case.GateReviews.Where(x => x.Gate == Gates.G2).OrderByDescending(x => x.CreatedAt).FirstOrDefault();
