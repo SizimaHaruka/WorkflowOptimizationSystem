@@ -27,7 +27,7 @@ public sealed class LoginModel(
             return LocalRedirect(returnUrl ?? "/");
         }
 
-        return WindowsEnabled && !showLogin
+        return WindowsEnabled && !showLogin && !Request.Cookies.ContainsKey(AuthenticationCookieNames.ExplicitLogout)
             ? RedirectToPage("Login", "WindowsCallback", new { returnUrl, attempted = false })
             : Page();
     }
@@ -97,6 +97,7 @@ public sealed class LoginModel(
         }
 
         var claims = new[] { new Claim(ClaimTypes.Name, user.DisplayName), new Claim(ClaimTypes.Upn, upn) };
+        Response.Cookies.Delete(AuthenticationCookieNames.ExplicitLogout, new CookieOptions { Path = "/" });
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
             new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme)));
         return LocalRedirect(string.IsNullOrWhiteSpace(returnUrl) ? "/" : returnUrl);
