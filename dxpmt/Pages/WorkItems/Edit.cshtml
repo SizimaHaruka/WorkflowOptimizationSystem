@@ -2,45 +2,5 @@
 @model dxpmt.Pages.WorkItems.EditModel
 @{ ViewData["Title"] = "F03 作業ヒアリング票を修正"; }
 <div class="page-heading mb-4"><p class="eyebrow">F03-@Model.Item.Sequence</p><h1>作業ヒアリング票を修正</h1></div>
-<form method="post" class="form-card">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <section class="form-section">
-        <h2>基本情報</h2>
-        <div class="row g-3">
-            <div class="col-md-6"><label asp-for="Input.BusinessProcessName" class="form-label"></label><input asp-for="Input.BusinessProcessName" class="form-control" /></div>
-            <div class="col-md-6"><label asp-for="Input.Name" class="form-label"></label><input asp-for="Input.Name" class="form-control" /><span asp-validation-for="Input.Name" class="text-danger"></span></div>
-            <div class="col-md-4"><label asp-for="Input.DepartmentAndRole" class="form-label"></label><input asp-for="Input.DepartmentAndRole" class="form-control" /></div>
-            <div class="col-md-4"><label asp-for="Input.Performer" class="form-label"></label><input asp-for="Input.Performer" class="form-control" /></div>
-            <div class="col-md-4"><label asp-for="Input.Location" class="form-label"></label><input asp-for="Input.Location" class="form-control" /></div>
-        </div>
-    </section>
-    <section class="form-section">
-        <h2>作業の輪郭</h2>
-        <div class="row g-3">
-            <div class="col-md-6"><label asp-for="Input.Content.Purpose" class="form-label">この作業の目的</label><textarea asp-for="Input.Content.Purpose" class="form-control" rows="2"></textarea></div>
-            <div class="col-md-6"><label asp-for="Input.Content.StartTrigger" class="form-label">開始のきっかけ</label><textarea asp-for="Input.Content.StartTrigger" class="form-control" rows="2"></textarea></div>
-            <div class="col-md-6"><label asp-for="Input.Content.PreviousWork" class="form-label">前の作業・受け取るもの</label><textarea asp-for="Input.Content.PreviousWork" class="form-control" rows="2"></textarea></div>
-            <div class="col-md-6"><label asp-for="Input.Content.CompletionCondition" class="form-label">完了条件・次作業への引渡し</label><textarea asp-for="Input.Content.CompletionCondition" class="form-control" rows="2"></textarea></div>
-        </div>
-    </section>
-    <section class="form-section">
-        <h2>実態・例外・負荷</h2>
-        <div class="row g-3">
-            <div class="col-12"><label asp-for="Input.Content.ActualSteps" class="form-label">実際の作業手順</label><textarea asp-for="Input.Content.ActualSteps" class="form-control" rows="5"></textarea></div>
-            <div class="col-md-6"><label asp-for="Input.Content.InformationAndAssets" class="form-label">情報・データ・現物</label><textarea asp-for="Input.Content.InformationAndAssets" class="form-control" rows="3"></textarea></div>
-            <div class="col-md-6"><label asp-for="Input.Content.JudgementAndConfirmation" class="form-label">判断・確認</label><textarea asp-for="Input.Content.JudgementAndConfirmation" class="form-control" rows="3"></textarea></div>
-            <div class="col-md-6"><label asp-for="Input.Content.ExceptionsAndDifferences" class="form-label">例外・異常・実態差</label><textarea asp-for="Input.Content.ExceptionsAndDifferences" class="form-control" rows="3"></textarea></div>
-            <div class="col-md-6"><label asp-for="Input.Content.Workload" class="form-label">作業負荷</label><textarea asp-for="Input.Content.Workload" class="form-control" rows="3"></textarea></div>
-            <div class="col-12"><label asp-for="Input.Content.CurrentProblems" class="form-label">問題と現在の回避方法</label><textarea asp-for="Input.Content.CurrentProblems" class="form-control" rows="3"></textarea></div>
-        </div>
-    </section>
-    <section class="form-section">
-        <h2>確認・宿題</h2>
-        <div class="row g-3">
-            <div class="col-md-8"><label asp-for="Input.Content.UnconfirmedItems" class="form-label">未確認事項</label><textarea asp-for="Input.Content.UnconfirmedItems" class="form-control" rows="2"></textarea></div>
-            <div class="col-md-4 d-flex align-items-end pb-2"><div class="form-check"><input asp-for="Input.IsConfirmed" class="form-check-input" /><label asp-for="Input.IsConfirmed" class="form-check-label"></label></div></div>
-        </div>
-    </section>
-    <div class="form-actions"><a class="btn btn-outline-secondary" asp-page="/WorkItems/Index" asp-route-caseId="@Model.Item.CaseId">キャンセル</a><button class="btn btn-primary">更新</button></div>
-</form>
+<partial name="_WorkItemForm" model="Model" />
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

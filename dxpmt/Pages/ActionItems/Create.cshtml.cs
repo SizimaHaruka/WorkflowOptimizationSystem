@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using dxpmt.Data;
 using dxpmt.Domain;
 using Microsoft.AspNetCore.Mvc;
@@ -7,14 +6,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace dxpmt.Pages.ActionItems;
 
-public sealed class CreateModel(ApplicationDbContext database) : PageModel
+public sealed class CreateModel(ApplicationDbContext database) : PageModel, IActionItemFormPage
 {
     [BindProperty]
-    public ActionItemInput Input { get; set; } = new();
+    public ActionItemInputModel Input { get; set; } = new();
 
     public ImprovementCase Case { get; private set; } = null!;
     public IReadOnlyList<string> Categories => ActionItemCategories.All;
     public IReadOnlyList<string> Statuses => ActionItemStatuses.All;
+    public int CaseId => Case.Id;
+    public string SubmitLabel => "保存";
 
     public async Task<IActionResult> OnGetAsync(int caseId)
     {
@@ -82,23 +83,4 @@ public sealed class CreateModel(ApplicationDbContext database) : PageModel
         return true;
     }
 
-    public sealed class ActionItemInput
-    {
-        [Display(Name = "発生日")]
-        public DateOnly RaisedOn { get; set; }
-        [Required, Display(Name = "区分")]
-        public string Category { get; set; } = ActionItemCategories.Unconfirmed;
-        [Required(ErrorMessage = "内容を入力してください。"), StringLength(2000), Display(Name = "内容")]
-        public string Content { get; set; } = string.Empty;
-        [StringLength(200), Display(Name = "確認・対応先")]
-        public string? ContactOrResponseTarget { get; set; }
-        [StringLength(100), Display(Name = "担当")]
-        public string? OwnerName { get; set; }
-        [Display(Name = "期限")]
-        public DateOnly? DueDate { get; set; }
-        [Required, Display(Name = "状態")]
-        public string Status { get; set; } = ActionItemStatuses.NotStarted;
-        [StringLength(2000), Display(Name = "回答・処置")]
-        public string? Response { get; set; }
-    }
 }
