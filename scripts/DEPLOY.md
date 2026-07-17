@@ -1,16 +1,16 @@
 # IIS デプロイ
 
-管理者としてPowerShellを起動し、`deploy.settings.example.ps1` を `deploy.settings.ps1` として複製して、ブランチ名・IISサイト名・アプリプール名・配置先を実環境に合わせます。既定では、スクリプトを配置したローカルリポジトリを直接ビルドし、Gitサーバーやインターネットへ接続しません。
+管理者としてPowerShellを起動し、`deploy.settings.example.ps1` を `deploy.settings.ps1` として複製して、リポジトリURL・ブランチ名・IISサイト名・アプリプール名・配置先を実環境に合わせます。既定では、指定ブランチをGitリポジトリから同期してビルドします。
 
 ```powershell
 Set-Location C:\deploy\dxpmt-repo\scripts
 .\deploy.ps1
 ```
 
-Gitサーバーから同期する運用に切り替える場合だけ、`RepositoryUrl` を設定したうえで `-SyncRepository` を明示指定します。ビルド済みステージングを配置するだけの場合は `-SkipBuild` を指定します。
+リポジトリ同期を省略して現在の作業ツリーを使う場合は `-SkipPull` を指定します。ビルド済みステージングを配置するだけの場合は `-SkipPull -SkipBuild` を指定します。
 
 ```powershell
-.\deploy.ps1 -SyncRepository
+.\deploy.ps1 -SkipPull
 ```
 
 ```powershell

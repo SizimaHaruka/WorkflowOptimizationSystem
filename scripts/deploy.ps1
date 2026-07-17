@@ -1,7 +1,6 @@
 [CmdletBinding()]
 param(
     [string]$SettingsPath = (Join-Path $PSScriptRoot 'deploy.settings.ps1'),
-    [switch]$SyncRepository,
     [switch]$SkipPull,
     [switch]$SkipBuild,
     [switch]$SkipTests,
@@ -406,11 +405,11 @@ $script:DeployLogPath = Join-Path $settings.LogRoot ("deploy_{0}.log" -f (Get-Da
 
 try {
     Write-Log 'Deployment started.'
-    if ($SyncRepository -and -not $SkipPull) {
+    if (-not $SkipPull) {
         Invoke-LoggedStep -Name 'Sync repository' -Action { Sync-Repository -Settings $settings }
     }
     else {
-        Write-Log 'Repository synchronization skipped. Local repository will be deployed.'
+        Write-Log 'Repository synchronization skipped by -SkipPull.' 'WARN'
     }
 
     $commitHash = Get-CommitHash -Settings $settings
