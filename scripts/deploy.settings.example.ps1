@@ -21,5 +21,12 @@ $DeploySettings = @{
     HealthCheckUrl = 'http://server-am:8082/'
 
     PreserveDirectories = @('logs', 'keys')
-    PreserveFiles = @('appsettings.Production.Local.json')
+    PreserveFiles = @(
+        'appsettings.Production.Local.json',
+        'appsettings.Development.Local.json'
+    )
+
+    # アプリプールに変更権限を付与する実行時ディレクトリです。
+    RuntimeDirectories = @('logs', 'keys')
+    HealthCheckHostHeader = ''
 }
