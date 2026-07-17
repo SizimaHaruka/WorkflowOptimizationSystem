@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using dxpmt.Data;
 using dxpmt.Domain;
 using Microsoft.AspNetCore.Mvc;
@@ -7,18 +6,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace dxpmt.Pages.ActionItems;
 
-public sealed class EditModel(ApplicationDbContext database) : PageModel
+public sealed class EditModel(ApplicationDbContext database) : PageModel, IActionItemFormPage
 {
     [BindProperty]
-    public EditInput Input { get; set; } = new();
+    public ActionItemInputModel Input { get; set; } = new();
     public ActionItem Item { get; private set; } = null!;
     public IReadOnlyList<string> Categories => ActionItemCategories.All;
     public IReadOnlyList<string> Statuses => ActionItemStatuses.All;
+    public int CaseId => Item.CaseId;
+    public string SubmitLabel => "更新";
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
         if (!await LoadAsync(id)) return NotFound();
-        Input = EditInput.From(Item);
+        Input = ActionItemInputModel.From(Item);
         return Page();
     }
 
@@ -52,21 +53,4 @@ public sealed class EditModel(ApplicationDbContext database) : PageModel
         return true;
     }
 
-    public sealed class EditInput
-    {
-        public DateOnly RaisedOn { get; set; }
-        [Required] public string Category { get; set; } = string.Empty;
-        [Required(ErrorMessage = "内容を入力してください。"), StringLength(2000)] public string Content { get; set; } = string.Empty;
-        [StringLength(200)] public string? ContactOrResponseTarget { get; set; }
-        [StringLength(100)] public string? OwnerName { get; set; }
-        public DateOnly? DueDate { get; set; }
-        [Required] public string Status { get; set; } = string.Empty;
-        [StringLength(2000)] public string? Response { get; set; }
-
-        public static EditInput From(ActionItem item) => new()
-        {
-            RaisedOn = item.RaisedOn, Category = item.Category, Content = item.Content, ContactOrResponseTarget = item.ContactOrResponseTarget,
-            OwnerName = item.OwnerName, DueDate = item.DueDate, Status = item.Status, Response = item.Response
-        };
-    }
 }

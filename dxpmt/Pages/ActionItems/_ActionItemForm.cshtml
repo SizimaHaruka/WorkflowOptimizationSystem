@@ -1,6 +1,6 @@
-@model dxpmt.Pages.ActionItems.CreateModel
+@model dxpmt.Pages.ActionItems.IActionItemFormPage
 <form method="post" class="form-card">
-    <input type="hidden" name="caseId" value="@Model.Case.Id" />
+    <input type="hidden" name="caseId" value="@Model.CaseId" />
     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
     <div class="row g-3">
         <div class="col-md-4"><label asp-for="Input.RaisedOn" class="form-label"></label><input asp-for="Input.RaisedOn" class="form-control" type="date" /></div>
@@ -12,5 +12,5 @@
         <div class="col-md-3"><label asp-for="Input.DueDate" class="form-label"></label><input asp-for="Input.DueDate" class="form-control" type="date" /></div>
         <div class="col-12"><label asp-for="Input.Response" class="form-label"></label><textarea asp-for="Input.Response" class="form-control" rows="3"></textarea></div>
     </div>
-    <div class="form-actions"><a class="btn btn-outline-secondary" asp-page="/ActionItems/Index" asp-route-caseId="@Model.Case.Id">キャンセル</a><button class="btn btn-primary" type="submit">保存</button></div>
+    <div class="form-actions"><a class="btn btn-outline-secondary" asp-page="/ActionItems/Index" asp-route-caseId="@Model.CaseId">キャンセル</a><button class="btn btn-primary" type="submit">@Model.SubmitLabel</button></div>
 </form>

@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using dxpmt.Data;
 using dxpmt.Domain;
@@ -8,10 +7,12 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 namespace dxpmt.Pages.WorkItems;
-public sealed class CreateModel(ApplicationDbContext database) : PageModel
+public sealed class CreateModel(ApplicationDbContext database) : PageModel, IWorkItemFormPage
 {
-    [BindProperty] public InputModel Input { get; set; } = new();
+    [BindProperty] public WorkItemInputModel Input { get; set; } = new();
     public ImprovementCase Case { get; private set; } = null!;
+    public int CaseId => Case.Id;
+    public string SubmitLabel => "保存";
     public async Task<IActionResult> OnGetAsync(int caseId) { if (!await Load(caseId)) return NotFound(); return Page(); }
     public async Task<IActionResult> OnPostAsync(int caseId)
     {
@@ -21,5 +22,4 @@ public sealed class CreateModel(ApplicationDbContext database) : PageModel
         Case.UpdatedAt=now; await database.SaveChangesAsync(); return RedirectToPage("/WorkItems/Index",new{caseId});
     }
     private async Task<bool> Load(int caseId) { var item=await database.Cases.SingleOrDefaultAsync(x=>x.Id==caseId); if(item is null)return false; Case=item; return true; }
-    public sealed class InputModel { [Display(Name="業務・工程名")] public string? BusinessProcessName {get;set;} [Required,Display(Name="作業名")] public string Name {get;set;}=""; [Display(Name="担当部署・役割")] public string? DepartmentAndRole {get;set;} [Display(Name="実施者")] public string? Performer {get;set;} [Display(Name="実施場所")] public string? Location {get;set;} [Display(Name="対象者による内容確認済み")] public bool IsConfirmed {get;set;} public WorkItemFormModel Content {get;set;}=new(); }
 }

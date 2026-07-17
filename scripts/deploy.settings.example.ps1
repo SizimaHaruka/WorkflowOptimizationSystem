@@ -1,7 +1,8 @@
 $DeploySettings = @{
     # 実ファイル deploy.settings.ps1 は Git 管理外です。
+    # デプロイ前に指定ブランチを同期します。同期を省略する場合は -SkipPull を指定します。
     RepositoryUrl = '<REPOSITORY_URL>'
-    BranchName = 'main'
+    BranchName = 'develop'
 
     RepoRoot = 'C:\deploy\dxpmt-repo'
     StagingRoot = 'C:\deploy\dxpmt-staging'
@@ -21,5 +22,12 @@ $DeploySettings = @{
     HealthCheckUrl = 'http://server-am:8082/'
 
     PreserveDirectories = @('logs', 'keys')
-    PreserveFiles = @('appsettings.Production.Local.json')
+    PreserveFiles = @(
+        'appsettings.Production.Local.json',
+        'appsettings.Development.Local.json'
+    )
+
+    # アプリプールに変更権限を付与する実行時ディレクトリです。
+    RuntimeDirectories = @('logs', 'keys')
+    HealthCheckHostHeader = ''
 }
