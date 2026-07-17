@@ -236,6 +236,7 @@ public sealed class GateModel(ApplicationDbContext database, CurrentUserService 
             Gates.G0 => ProblemIsClear && RequesterIsClear && OwnerIsClear && ScopeIsClear,
             Gates.G1 => StartEventIsClear && EndStateIsClear && TargetDepartmentsAreAgreed && ExcludedScopeIsAgreed,
             Gates.G2 => WorkItemsAreConfirmed && FlowIsConnected && InputsOutputsAreConfirmed && JudgementsAreConfirmed && ExceptionsAreIncluded,
+            Gates.G3 or Gates.G4 or Gates.G5 or Gates.G6 => WorkItemsAreConfirmed && FlowIsConnected && InputsOutputsAreConfirmed && JudgementsAreConfirmed && ExceptionsAreIncluded,
             _ => false
         };
 
