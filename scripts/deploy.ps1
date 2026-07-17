@@ -160,8 +160,8 @@ function Get-CommitHash {
 function Invoke-DeployTests {
     param([hashtable]$Settings, [string]$ConfigurationName)
 
-    $testProjects = Get-SettingValue -Settings $Settings -Name 'TestProjects' -DefaultValue @()
-    if ($null -eq $testProjects -or $testProjects.Count -eq 0) {
+    $testProjects = @(Get-SettingValue -Settings $Settings -Name 'TestProjects' -DefaultValue @())
+    if ($testProjects.Count -eq 0) {
         Invoke-ExternalCommand -FilePath 'dotnet' -Arguments @('test', $Settings.SolutionPath, '-c', $ConfigurationName, '--no-build', '--verbosity', 'minimal') -WorkingDirectory $Settings.RepoRoot
         return
     }
@@ -405,7 +405,13 @@ $script:DeployLogPath = Join-Path $settings.LogRoot ("deploy_{0}.log" -f (Get-Da
 
 try {
     Write-Log 'Deployment started.'
-    if (-not $SkipPull) { Invoke-LoggedStep -Name 'Sync repository' -Action { Sync-Repository -Settings $settings } }
+    $syncRepository = Get-SettingValue -Settings $settings -Name 'SyncRepository' -DefaultValue $false
+    if (-not $SkipPull -and $syncRepository) {
+        Invoke-LoggedStep -Name 'Sync repository' -Action { Sync-Repository -Settings $settings }
+    }
+    elseif (-not $SkipPull) {
+        Write-Log 'Repository synchronization skipped because SyncRepository is disabled.'
+    }
 
     $commitHash = Get-CommitHash -Settings $settings
     Write-Log "Commit hash: $commitHash"
