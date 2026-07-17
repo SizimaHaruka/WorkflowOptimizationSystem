@@ -17,7 +17,7 @@ public sealed class CreateModel(ApplicationDbContext database) : PageModel
     {
         if (!await Load(caseId)) return NotFound(); if (!ModelState.IsValid) return Page();
         var now=DateTime.UtcNow; var seq=(await database.WorkItems.Where(x=>x.CaseId==caseId).MaxAsync(x=>(int?)x.Sequence)??0)+1;
-        database.WorkItems.Add(new WorkItem { CaseId=caseId, Sequence=seq, BusinessProcessName=Input.BusinessProcessName?.Trim()??"", Name=Input.Name.Trim(), DepartmentAndRole=Input.DepartmentAndRole?.Trim()??"", Performer=Input.Performer?.Trim()??"", Location=Input.Location?.Trim()??"", IsConfirmed=Input.IsConfirmed, ContentJson=JsonSerializer.Serialize(Input.Content), CreatedAt=now, UpdatedAt=now });
+        database.WorkItems.Add(new WorkItem { CaseId=caseId, Sequence=seq, WorkType=WorkItemTypes.AsIs, BusinessProcessName=Input.BusinessProcessName?.Trim()??"", Name=Input.Name.Trim(), DepartmentAndRole=Input.DepartmentAndRole?.Trim()??"", Performer=Input.Performer?.Trim()??"", Location=Input.Location?.Trim()??"", IsConfirmed=Input.IsConfirmed, ContentJson=JsonSerializer.Serialize(Input.Content), CreatedAt=now, UpdatedAt=now });
         Case.UpdatedAt=now; await database.SaveChangesAsync(); return RedirectToPage("/WorkItems/Index",new{caseId});
     }
     private async Task<bool> Load(int caseId) { var item=await database.Cases.SingleOrDefaultAsync(x=>x.Id==caseId); if(item is null)return false; Case=item; return true; }

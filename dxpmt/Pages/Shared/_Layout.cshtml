@@ -23,7 +23,11 @@
                         <li class="nav-item"><a class="nav-link" asp-page="/Cases/Index">案件</a></li>
                         <li class="nav-item"><a class="nav-link" asp-page="/ActionItems/Index">課題・宿題</a></li>
                     </ul>
-                    <span class="navbar-text">フェーズ1 / 認証未導入</span>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <span class="navbar-text">@User.Identity.Name</span>
+                        <form method="post" asp-page="/Auth/Logout" class="d-inline"><button class="btn btn-outline-light btn-sm ms-2">ログアウト</button></form>
+                    }
                 </div>
             </div>
         </nav>

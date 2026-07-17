@@ -17,13 +17,13 @@ public sealed class IndexModel(ApplicationDbContext database) : PageModel
         var item = await database.Cases.AsNoTracking().SingleOrDefaultAsync(x => x.Id == CaseId);
         if (item is null) return NotFound();
         Case = item;
-        Items = await database.WorkItems.AsNoTracking().Include(x => x.Problems.Where(p => !p.IsDeleted)).Where(x => x.CaseId == CaseId && (IncludeDeleted || !x.IsDeleted)).OrderBy(x => x.Sequence).ToListAsync();
+        Items = await database.WorkItems.AsNoTracking().Include(x => x.Problems.Where(p => !p.IsDeleted)).Where(x => x.CaseId == CaseId && x.WorkType == WorkItemTypes.AsIs && (IncludeDeleted || !x.IsDeleted)).OrderBy(x => x.Sequence).ToListAsync();
         return Page();
     }
 
     public async Task<IActionResult> OnPostDeleteAsync(int id)
     {
-        var item = await database.WorkItems.SingleOrDefaultAsync(x => x.Id == id && x.CaseId == CaseId && !x.IsDeleted);
+        var item = await database.WorkItems.SingleOrDefaultAsync(x => x.Id == id && x.CaseId == CaseId && x.WorkType == WorkItemTypes.AsIs && !x.IsDeleted);
         if (item is null) return NotFound();
         item.IsDeleted = true;
         item.DeletedAt = item.UpdatedAt = DateTime.UtcNow;
@@ -34,7 +34,7 @@ public sealed class IndexModel(ApplicationDbContext database) : PageModel
 
     public async Task<IActionResult> OnPostRestoreAsync(int id)
     {
-        var item = await database.WorkItems.SingleOrDefaultAsync(x => x.Id == id && x.CaseId == CaseId && x.IsDeleted);
+        var item = await database.WorkItems.SingleOrDefaultAsync(x => x.Id == id && x.CaseId == CaseId && x.WorkType == WorkItemTypes.AsIs && x.IsDeleted);
         if (item is null) return NotFound();
         item.IsDeleted = false;
         item.DeletedAt = null;

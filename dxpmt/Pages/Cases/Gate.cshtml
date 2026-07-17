@@ -20,7 +20,7 @@
             <label><input asp-for="Input.TargetDepartmentsAreAgreed" class="form-check-input" /> 対象部署が合意済みである</label>
             <label><input asp-for="Input.ExcludedScopeIsAgreed" class="form-check-input" /> 除外範囲が合意済みである</label>
         }
-        else
+        else if (Model.Gate == Gates.G2)
         {
             <label><input asp-for="Input.WorkItemsAreConfirmed" class="form-check-input" /> 通常作業と主要作業が対象者により確認済みである</label>
             <label><input asp-for="Input.FlowIsConnected" class="form-check-input" /> 開始から終了までのフローがつながっている</label>
@@ -28,8 +28,16 @@
             <label><input asp-for="Input.JudgementsAreConfirmed" class="form-check-input" /> 主要な判断・確認が記録済みである</label>
             <label><input asp-for="Input.ExceptionsAreIncluded" class="form-check-input" /> 主要な例外・差戻しが記録済みである</label>
         }
+        else
+        {
+            <label><input asp-for="Input.WorkItemsAreConfirmed" class="form-check-input" /> このゲートに必要な対象データが登録済みである</label>
+            <label><input asp-for="Input.FlowIsConnected" class="form-check-input" /> 成果物と後続作業の関係が確認済みである</label>
+            <label><input asp-for="Input.InputsOutputsAreConfirmed" class="form-check-input" /> 影響範囲が確認済みである</label>
+            <label><input asp-for="Input.JudgementsAreConfirmed" class="form-check-input" /> 判断根拠が記録済みである</label>
+            <label><input asp-for="Input.ExceptionsAreIncluded" class="form-check-input" /> 残課題・制約を確認済みである</label>
+        }
     </div></section>
-    <section class="form-section"><h2>判定</h2><div class="row g-3"><div class="col-md-4"><label asp-for="Input.Decision" class="form-label"></label><select asp-for="Input.Decision" class="form-select"><option value="承認">承認</option><option value="差戻し">差戻し</option></select></div><div class="col-md-4"><label asp-for="Input.ReviewerName" class="form-label"></label><input asp-for="Input.ReviewerName" class="form-control" /><span asp-validation-for="Input.ReviewerName" class="text-danger"></span></div><div class="col-md-4"><label asp-for="Input.ReviewedOn" class="form-label"></label><input asp-for="Input.ReviewedOn" class="form-control" type="date" /></div><div class="col-12"><label asp-for="Input.Comment" class="form-label"></label><textarea asp-for="Input.Comment" class="form-control" rows="4" placeholder="差戻し理由、判断の前提、次に確認することを記録します。"></textarea></div></div></section>
+    <section class="form-section"><h2>判定</h2><div class="row g-3"><div class="col-md-4"><label asp-for="Input.Decision" class="form-label"></label><select asp-for="Input.Decision" class="form-select"><option value="承認">承認</option><option value="差戻し">差戻し</option></select></div><div class="col-md-4"><label class="form-label">判定者</label><input class="form-control" value="@Model.ReviewerName" readonly /><div class="form-text">ログインユーザーを自動記録します。</div></div><div class="col-md-4"><label asp-for="Input.ReviewedOn" class="form-label"></label><input asp-for="Input.ReviewedOn" class="form-control" type="date" /></div><div class="col-12"><label asp-for="Input.Comment" class="form-label"></label><textarea asp-for="Input.Comment" class="form-control" rows="4" placeholder="差戻し理由、判断の前提、次に確認することを記録します。"></textarea></div></div></section>
     <div class="form-actions"><a class="btn btn-outline-secondary" asp-page="/Cases/Details" asp-route-id="@Model.Case.Id">キャンセル</a><button class="btn btn-primary" type="submit">判定を記録</button></div>
 </form>
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

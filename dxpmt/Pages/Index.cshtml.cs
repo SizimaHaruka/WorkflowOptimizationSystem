@@ -10,8 +10,7 @@ public sealed class IndexModel(ApplicationDbContext database) : PageModel
     public List<StatusCount> StatusCounts { get; private set; } = [];
     public List<ActionItem> OverdueActionItems { get; private set; } = [];
     public int ActiveCaseCount { get; private set; }
-    public int G0PendingCount { get; private set; }
-    public int G1PendingCount { get; private set; }
+    public List<GateCount> GatePendingCounts { get; private set; } = [];
 
     public async Task OnGetAsync()
     {
@@ -27,9 +26,12 @@ public sealed class IndexModel(ApplicationDbContext database) : PageModel
             .ToList();
 
         ActiveCaseCount = cases.Count(x => x.Status is not CaseStatuses.Completed and not CaseStatuses.OnHold and not CaseStatuses.Cancelled);
-        G0PendingCount = cases.Count(x => !x.GateReviews.Any(g => g.Gate == Gates.G0 && g.Decision == GateDecisions.Approved));
-        G1PendingCount = cases.Count(x => x.GateReviews.Any(g => g.Gate == Gates.G0 && g.Decision == GateDecisions.Approved)
-            && !x.GateReviews.Any(g => g.Gate == Gates.G1 && g.Decision == GateDecisions.Approved));
+        GatePendingCounts = Gates.All.Select(gate => new GateCount(
+            Gates.GetName(gate),
+            cases.Count(x => x.Status is not CaseStatuses.Completed and not CaseStatuses.Cancelled
+                && Gates.All.Take(Gates.All.ToList().IndexOf(gate)).All(prior => x.GateReviews.Any(r => r.Gate == prior && r.Decision == GateDecisions.Approved))
+                && !x.GateReviews.Any(r => r.Gate == gate && r.Decision == GateDecisions.Approved))))
+            .ToList();
 
         var today = DateOnly.FromDateTime(DateTime.Today);
         OverdueActionItems = await database.ActionItems
@@ -41,4 +43,5 @@ public sealed class IndexModel(ApplicationDbContext database) : PageModel
     }
 
     public sealed record StatusCount(string Status, int Count);
+    public sealed record GateCount(string GateName, int Count);
 }

@@ -39,7 +39,7 @@
     {
         <div class="table-responsive">
             <table class="table app-table mb-0">
-                <thead><tr><th>案件番号</th><th>案件名</th><th>依頼部署</th><th>責任者</th><th>優先度</th><th>ステータス</th><th>更新日</th></tr></thead>
+                <thead><tr><th>案件番号</th><th>案件名</th><th>依頼部署</th><th>責任者</th><th>優先度</th><th>ステータス</th><th>次のゲート</th><th>更新日</th></tr></thead>
                 <tbody>
                 @foreach (var item in Model.Cases)
                 {
@@ -50,6 +50,7 @@
                         <td>@item.OwnerName</td>
                         <td><span class="priority priority-@item.Priority">@item.Priority</span></td>
                         <td><span class="status-badge">@item.Status</span></td>
+                        <td>@Model.NextGates[item.Id]</td>
                         <td>@item.UpdatedAt.ToString("yyyy/MM/dd")</td>
                     </tr>
                 }

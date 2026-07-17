@@ -2,11 +2,17 @@
 @model dxpmt.Pages.Cases.DetailsModel
 @{
     ViewData["Title"] = Model.Case.CaseNumber;
-    var f01 = Model.Case.Forms.SingleOrDefault(x => x.FormType == FormTypes.Reception);
-    var f02 = Model.Case.Forms.SingleOrDefault(x => x.FormType == FormTypes.SurveyPlan);
+    var f01 = Model.Case.Forms.Where(x => x.FormType == FormTypes.Reception).OrderByDescending(x => x.Version).FirstOrDefault();
+    var f02 = Model.Case.Forms.Where(x => x.FormType == FormTypes.SurveyPlan).OrderByDescending(x => x.Version).FirstOrDefault();
+    var f04 = Model.Case.Forms.Where(x => x.FormType == FormTypes.AsIsFlow).OrderByDescending(x => x.Version).FirstOrDefault();
+    var f09 = Model.Case.Forms.Where(x => x.FormType == FormTypes.EffectConfirmation).OrderByDescending(x => x.Version).FirstOrDefault();
     var g0 = Model.Case.GateReviews.Where(x => x.Gate == Gates.G0).OrderByDescending(x => x.CreatedAt).FirstOrDefault();
     var g1 = Model.Case.GateReviews.Where(x => x.Gate == Gates.G1).OrderByDescending(x => x.CreatedAt).FirstOrDefault();
     var g2 = Model.Case.GateReviews.Where(x => x.Gate == Gates.G2).OrderByDescending(x => x.CreatedAt).FirstOrDefault();
+    var g3 = Model.Case.GateReviews.Where(x => x.Gate == Gates.G3).OrderByDescending(x => x.CreatedAt).FirstOrDefault();
+    var g4 = Model.Case.GateReviews.Where(x => x.Gate == Gates.G4).OrderByDescending(x => x.CreatedAt).FirstOrDefault();
+    var g5 = Model.Case.GateReviews.Where(x => x.Gate == Gates.G5).OrderByDescending(x => x.CreatedAt).FirstOrDefault();
+    var g6 = Model.Case.GateReviews.Where(x => x.Gate == Gates.G6).OrderByDescending(x => x.CreatedAt).FirstOrDefault();
 }
 
 @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
@@ -24,6 +30,8 @@
         <div class="text-end">
             <span class="status-badge status-badge-large">@Model.Case.Status</span>
             <p class="small text-muted mt-2 mb-0">受付日: @Model.Case.RegisteredOn.ToString("yyyy/MM/dd")</p>
+            <a class="btn btn-outline-secondary btn-sm mt-2" asp-page-handler="ExportMarkdown" asp-route-id="@Model.Case.Id">Markdown出力</a>
+            <a class="btn btn-outline-secondary btn-sm mt-2" asp-page-handler="ExportCsv" asp-route-id="@Model.Case.Id">CSV出力</a>
         </div>
     </div>
 </div>
@@ -46,12 +54,12 @@
                     <span><strong>調査計画票</strong><small>@(f02?.Status ?? "未作成") / 最終更新: @(f02?.UpdatedAt.ToString("yyyy/MM/dd HH:mm") ?? "—")</small></span>
                     <span aria-hidden="true">→</span>
                 </a>
-                <a class="workflow-link" asp-page="/ActionItems/Create" asp-route-caseId="@Model.Case.Id">
+                <a class="workflow-link" asp-page="/ActionItems/Index" asp-route-caseId="@Model.Case.Id">
                     <span class="workflow-code">F10</span>
                     <span><strong>課題・宿題管理表</strong><small>@Model.Case.ActionItems.Count 件（未完了: @Model.Case.ActionItems.Count(x => x.Status != ActionItemStatuses.Completed) 件）</small></span>
                     <span aria-hidden="true">→</span>
                 </a>
-                <a class="workflow-link" asp-page="/Decisions/Create" asp-route-caseId="@Model.Case.Id">
+                <a class="workflow-link" asp-page="/Decisions/Index" asp-route-caseId="@Model.Case.Id">
                     <span class="workflow-code">F11</span>
                     <span><strong>意思決定記録</strong><small>@Model.Case.DecisionRecords.Count 件</small></span>
                     <span aria-hidden="true">→</span>
@@ -63,8 +71,13 @@
             <div class="panel-heading"><h2>As-Is調査・問題分析</h2></div>
             <div class="workflow-links">
                 <a class="workflow-link" asp-page="/WorkItems/Index" asp-route-caseId="@Model.Case.Id"><span class="workflow-code">F03</span><span><strong>作業ヒアリング票</strong><small>作業単位で実態を記録</small></span><span>→</span></a>
-                <a class="workflow-link" asp-page="/Forms/F04" asp-route-caseId="@Model.Case.Id"><span class="workflow-code">F04</span><span><strong>業務フロー整理票</strong><small>作業をつなげて確認</small></span><span>→</span></a>
+                <a class="workflow-link" asp-page="/Forms/F04" asp-route-caseId="@Model.Case.Id"><span class="workflow-code">F04</span><span><strong>業務フロー整理票</strong><small>@(f04?.Status ?? "未作成") / 最終更新: @(f04?.UpdatedAt.ToString("yyyy/MM/dd HH:mm") ?? "—")</small></span><span>→</span></a>
                 <a class="workflow-link" asp-page="/Problems/Index" asp-route-caseId="@Model.Case.Id"><span class="workflow-code">F05</span><span><strong>問題・課題一覧</strong><small>作業に紐付けて分析</small></span><span>→</span></a>
+                <a class="workflow-link" asp-page="/ImprovementOptions/Index" asp-route-caseId="@Model.Case.Id"><span class="workflow-code">F06</span><span><strong>改善案評価票</strong><small>@Model.ImprovementOptionCount 件 / 効果・負荷・リスクを比較</small></span><span>→</span></a>
+                <a class="workflow-link" asp-page="/ToBeWorkItems/Index" asp-route-caseId="@Model.Case.Id"><span class="workflow-code">F07</span><span><strong>To-Be作業定義票</strong><small>@Model.ToBeWorkItemCount 件 / 改善後の役割と作業を定義</small></span><span>→</span></a>
+                <a class="workflow-link" asp-page="/Requirements/Index" asp-route-caseId="@Model.Case.Id"><span class="workflow-code">F08</span><span><strong>要求事項一覧</strong><small>@Model.RequirementCount 件 / 実現すべき要件と受入条件を整理</small></span><span>→</span></a>
+                <a class="workflow-link" asp-page="/Forms/F09" asp-route-caseId="@Model.Case.Id"><span class="workflow-code">F09</span><span><strong>効果確認票</strong><small>@(f09?.Status ?? "未作成") / 最終更新: @(f09?.UpdatedAt.ToString("yyyy/MM/dd HH:mm") ?? "—")</small></span><span>→</span></a>
+                <a class="workflow-link" asp-page="/Traceability/Index" asp-route-caseId="@Model.Case.Id"><span class="workflow-code">追跡</span><span><strong>追跡ビュー</strong><small>作業から要求事項までの関係を確認</small></span><span>→</span></a>
             </div>
         </section>
 
@@ -80,16 +93,58 @@
                     <a class="btn btn-outline-primary btn-sm" asp-page="/Cases/Gate" asp-route-caseId="@Model.Case.Id" asp-route-gate="G0">G0を判定</a>
                 </div>
                 <div class="gate-card">
+                    <div><span class="workflow-code">G1</span><strong>範囲確定</strong></div>
+                    <p>@(g1 is null ? "未判定" : $"{g1.Decision} / {g1.ReviewerName} / {g1.ReviewedOn:yyyy/MM/dd}")</p>
+                    <a class="btn btn-outline-primary btn-sm" asp-page="/Cases/Gate" asp-route-caseId="@Model.Case.Id" asp-route-gate="G1">G1を判定</a>
+                </div>
+                <div class="gate-card">
                     <div><span class="workflow-code">G2</span><strong>As-Is確定</strong></div>
                     <p>@(g2 is null ? "未判定" : $"{g2.Decision} / {g2.ReviewerName} / {g2.ReviewedOn:yyyy/MM/dd}")</p>
                     <a class="btn btn-outline-primary btn-sm" asp-page="/Cases/Gate" asp-route-caseId="@Model.Case.Id" asp-route-gate="G2">G2を判定</a>
                 </div>
                 <div class="gate-card">
-                    <div><span class="workflow-code">G1</span><strong>範囲確定</strong></div>
-                    <p>@(g1 is null ? "未判定" : $"{g1.Decision} / {g1.ReviewerName} / {g1.ReviewedOn:yyyy/MM/dd}")</p>
-                    <a class="btn btn-outline-primary btn-sm" asp-page="/Cases/Gate" asp-route-caseId="@Model.Case.Id" asp-route-gate="G1">G1を判定</a>
+                    <div><span class="workflow-code">G3</span><strong>改善案選定</strong></div>
+                    <p>@(g3 is null ? "未判定" : $"{g3.Decision} / {g3.ReviewerName} / {g3.ReviewedOn:yyyy/MM/dd}")</p>
+                    <a class="btn btn-outline-primary btn-sm" asp-page="/Cases/Gate" asp-route-caseId="@Model.Case.Id" asp-route-gate="G3">G3を判定</a>
+                </div>
+                <div class="gate-card">
+                    <div><span class="workflow-code">G4</span><strong>To-Be確定</strong></div>
+                    <p>@(g4 is null ? "未判定" : $"{g4.Decision} / {g4.ReviewerName} / {g4.ReviewedOn:yyyy/MM/dd}")</p>
+                    <a class="btn btn-outline-primary btn-sm" asp-page="/Cases/Gate" asp-route-caseId="@Model.Case.Id" asp-route-gate="G4">G4を判定</a>
+                </div>
+                <div class="gate-card">
+                    <div><span class="workflow-code">G5</span><strong>実施判断</strong></div>
+                    <p>@(g5 is null ? "未判定" : $"{g5.Decision} / {g5.ReviewerName} / {g5.ReviewedOn:yyyy/MM/dd}")</p>
+                    <a class="btn btn-outline-primary btn-sm" asp-page="/Cases/Gate" asp-route-caseId="@Model.Case.Id" asp-route-gate="G5">G5を判定</a>
+                </div>
+                <div class="gate-card">
+                    <div><span class="workflow-code">G6</span><strong>案件終結</strong></div>
+                    <p>@(g6 is null ? "未判定" : $"{g6.Decision} / {g6.ReviewerName} / {g6.ReviewedOn:yyyy/MM/dd}")</p>
+                    <a class="btn btn-outline-primary btn-sm" asp-page="/Cases/Gate" asp-route-caseId="@Model.Case.Id" asp-route-gate="G6">G6を判定</a>
                 </div>
             </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-heading"><h2>帳票版履歴</h2></div>
+            @if (!Model.Case.Forms.Any())
+            {
+                <p class="empty-state">保存済みの帳票はありません。</p>
+            }
+            else
+            {
+                <div class="table-responsive mb-4">
+                    <table class="table app-table mb-0">
+                        <thead><tr><th>帳票</th><th>版</th><th>状態</th><th>更新日時</th></tr></thead>
+                        <tbody>
+                        @foreach (var form in Model.Case.Forms.OrderBy(x => x.FormType).ThenByDescending(x => x.Version))
+                        {
+                            <tr><td>@form.FormType</td><td>第@form.Version 版</td><td>@form.Status</td><td>@form.UpdatedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm")</td></tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
         </section>
 
         <section class="panel">
@@ -141,8 +196,8 @@
                 </div>
                 <div class="mb-3">
                     <label asp-for="StatusChange.ChangedBy" class="form-label"></label>
-                    <input asp-for="StatusChange.ChangedBy" class="form-control" />
-                    <span asp-validation-for="StatusChange.ChangedBy" class="text-danger small"></span>
+                    <input asp-for="StatusChange.ChangedBy" class="form-control" readonly />
+                    <div class="form-text">ログインユーザーを自動記録します。</div>
                 </div>
                 <div class="mb-3">
                     <label asp-for="StatusChange.Comment" class="form-label"></label>

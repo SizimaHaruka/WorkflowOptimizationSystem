@@ -1,4 +1,8 @@
 using dxpmt.Data;
+using dxpmt.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +15,21 @@ builder.Services.AddRazorPages()
     .AddMvcOptions(options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.Configure<DxpmtAuthenticationOptions>(builder.Configuration.GetSection(DxpmtAuthenticationOptions.SectionName));
+builder.Services.Configure<GhauthOptions>(builder.Configuration.GetSection(GhauthOptions.SectionName));
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<CurrentUserService>();
+builder.Services.AddScoped<GhauthUserService>();
+builder.Services.AddScoped<ActiveDirectoryUserPrincipalNameResolver>();
+var authentication = builder.Configuration.GetSection(DxpmtAuthenticationOptions.SectionName).Get<DxpmtAuthenticationOptions>() ?? new();
+if (authentication.Enabled)
+{
+    builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        .AddCookie(options => { options.LoginPath = "/Auth/Login"; options.LogoutPath = "/Auth/Logout"; })
+        .AddNegotiate();
+    builder.Services.AddAuthorizationBuilder().SetFallbackPolicy(new AuthorizationPolicyBuilder(CookieAuthenticationDefaults.AuthenticationScheme).RequireAuthenticatedUser().Build());
+    builder.Services.AddRazorPages(options => options.Conventions.AllowAnonymousToFolder("/Auth"));
+}
 
 var app = builder.Build();
 
@@ -26,18 +45,11 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
+app.MapStaticAssets().AllowAnonymous();
 app.MapRazorPages()
    .WithStaticAssets();
-
-if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Database:InitializeOnStartup"))
-{
-    using var scope = app.Services.CreateScope();
-    var database = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    database.Database.EnsureCreated();
-    DevelopmentSchemaUpdater.Apply(database);
-}
 
 app.Run();

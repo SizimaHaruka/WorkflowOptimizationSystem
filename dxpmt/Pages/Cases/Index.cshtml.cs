@@ -15,6 +15,7 @@ public sealed class IndexModel(ApplicationDbContext database) : PageModel
     public string? Status { get; set; }
 
     public List<ImprovementCase> Cases { get; private set; } = [];
+    public Dictionary<int, string> NextGates { get; private set; } = [];
     public IReadOnlyList<string> StatusOptions => CaseStatuses.All;
 
     public async Task OnGetAsync()
@@ -30,6 +31,11 @@ public sealed class IndexModel(ApplicationDbContext database) : PageModel
             query = query.Where(x => x.Status == Status);
         }
 
-        Cases = await query.OrderByDescending(x => x.UpdatedAt).ToListAsync();
+        Cases = await query.Include(x => x.GateReviews).OrderByDescending(x => x.UpdatedAt).ToListAsync();
+        NextGates = Cases.ToDictionary(
+            x => x.Id,
+            x => Gates.All.FirstOrDefault(g => !x.GateReviews.Where(r => r.Gate == g).OrderByDescending(r => r.CreatedAt).FirstOrDefault()?.Decision.Equals(GateDecisions.Approved, StringComparison.Ordinal) == true) is { } gate
+                ? Gates.GetName(gate)
+                : "全ゲート完了");
     }
 }

@@ -1,0 +1,23 @@
+@page
+@model dxpmt.Pages.Auth.LoginModel
+@{ViewData["Title"]="ログイン";}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="form-card">
+            <h1>ログイン</h1>
+            <p class="text-muted">Windows認証で自動ログインできなかったため、ADアカウントでログインしてください。</p>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <form method="post" asp-page-handler="Local">
+                <div class="mb-3">
+                    <label asp-for="Input.UserName" class="form-label"></label>
+                    <input asp-for="Input.UserName" class="form-control" autocomplete="username" />
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Input.Password" class="form-label"></label>
+                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />
+                </div>
+                <button class="btn btn-outline-primary w-100">ADアカウントでログイン</button>
+            </form>
+        </div>
+    </div>
+</div>
