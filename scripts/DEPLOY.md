@@ -7,7 +7,11 @@ Set-Location C:\deploy\dxpmt-repo\scripts
 .\deploy.ps1
 ```
 
-Gitサーバーから同期する運用に切り替える場合だけ、`deploy.settings.ps1` の `SyncRepository = $true` と `RepositoryUrl` を設定します。ビルド済みステージングを配置するだけの場合は `-SkipPull -SkipBuild` を指定します。
+Gitサーバーから同期する運用に切り替える場合だけ、`RepositoryUrl` を設定したうえで `-SyncRepository` を明示指定します。ビルド済みステージングを配置するだけの場合は `-SkipBuild` を指定します。
+
+```powershell
+.\deploy.ps1 -SyncRepository
+```
 
 ```powershell
 .\deploy.ps1 -SkipPull

@@ -1,10 +1,9 @@
 $DeploySettings = @{
     # 実ファイル deploy.settings.ps1 は Git 管理外です。
     # 閉域環境では、スクリプトを配置したローカルリポジトリを直接ビルドします。
-    # 外部または社内Gitから同期する場合だけ SyncRepository を $true にします。
-    SyncRepository = $false
+    # Git同期が必要なときだけ、実行時に -SyncRepository を指定します。
     RepositoryUrl = ''
-    BranchName = 'develop'
+    BranchName = 'develop' # -SyncRepository 使用時だけ参照されます。
 
     RepoRoot = (Split-Path $PSScriptRoot -Parent)
     StagingRoot = 'C:\deploy\dxpmt-staging'
