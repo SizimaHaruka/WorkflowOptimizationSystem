@@ -44,6 +44,19 @@ function Assert-SafePath {
     }
 }
 
+function Join-ProcessArguments {
+    param([string[]]$Arguments)
+
+    return [string]::Join(' ', ($Arguments | ForEach-Object {
+        if ($_ -match '[\s"]') {
+            '"' + ($_ -replace '(\\*)"', '$1$1\"' -replace '(\\+)$', '$1$1') + '"'
+        }
+        else {
+            $_
+        }
+    }))
+}
+
 function Invoke-CommandLogged {
     param(
         [string]$FilePath,
@@ -53,14 +66,32 @@ function Invoke-CommandLogged {
     )
 
     Write-DeployLog ("EXEC  {0} {1}" -f $FilePath, ($Arguments -join ' '))
-    $output = & $FilePath @Arguments 2>&1
-    foreach ($line in $output) {
-        if (-not [string]::IsNullOrWhiteSpace($line)) {
-            Add-Content -LiteralPath $script:DeployLogPath -Value $line
+
+    $startInfo = New-Object System.Diagnostics.ProcessStartInfo
+    $startInfo.FileName = $FilePath
+    $startInfo.Arguments = Join-ProcessArguments -Arguments $Arguments
+    $startInfo.WorkingDirectory = $WorkingDirectory
+    $startInfo.UseShellExecute = $false
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $startInfo.CreateNoWindow = $true
+
+    $process = New-Object System.Diagnostics.Process
+    $process.StartInfo = $startInfo
+    [void]$process.Start()
+    $standardOutput = $process.StandardOutput.ReadToEnd()
+    $standardError = $process.StandardError.ReadToEnd()
+    $process.WaitForExit()
+
+    foreach ($stream in @($standardOutput, $standardError)) {
+        foreach ($line in ($stream -split "`r?`n")) {
+            if (-not [string]::IsNullOrWhiteSpace($line)) {
+                Add-Content -LiteralPath $script:DeployLogPath -Value $line
+            }
         }
     }
-    if ($AllowedExitCodes -notcontains $LASTEXITCODE) {
-        throw "Command failed with exit code ${LASTEXITCODE}: $FilePath $($Arguments -join ' ')"
+    if ($AllowedExitCodes -notcontains $process.ExitCode) {
+        throw "Command failed with exit code $($process.ExitCode): $FilePath $($Arguments -join ' ')"
     }
 }
 
