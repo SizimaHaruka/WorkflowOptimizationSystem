@@ -1,0 +1,109 @@
+@page
+@{
+    ViewData["Title"] = "業務フロー";
+}
+
+<div class="page-heading mb-4">
+    <p class="eyebrow">BUSINESS PROCESS</p>
+    <h1>合理化検討の業務フロー</h1>
+    <p class="text-muted mb-0">改善活動を、各工程のインプット・作業・帳票アウトプットで整理しています。</p>
+</div>
+
+<section class="panel">
+    <div class="panel-heading">
+        <h2>業務フロー図</h2>
+        <span class="text-muted small">上から下へ工程が進行します</span>
+    </div>
+    <div class="mermaid-diagram" aria-label="合理化検討の業務フロー図">
+        <pre class="mermaid">
+flowchart TB
+    subgraph P1["1. 改善対象を受け付ける"]
+        direction LR
+        I1["インプット&lt;br/&gt;・現場の困りごと&lt;br/&gt;・改善要望&lt;br/&gt;・対象業務の情報"]
+        W1["作業&lt;br/&gt;対象範囲、目的、期待成果を整理する"]
+        O1["アウトプット&lt;br/&gt;F01 案件受付票"]
+        I1 --> W1 --> O1
+    end
+
+    subgraph P2["2. 調査を計画する"]
+        direction LR
+        I2["インプット&lt;br/&gt;F01 案件受付票"]
+        W2["作業&lt;br/&gt;調査対象、関係者、進め方、日程を計画する"]
+        O2["アウトプット&lt;br/&gt;F02 調査計画票"]
+        I2 --> W2 --> O2
+    end
+
+    subgraph P3["3. 現状業務を把握する"]
+        direction LR
+        I3["インプット&lt;br/&gt;F02 調査計画票&lt;br/&gt;現場ヒアリング・既存資料"]
+        W3["作業&lt;br/&gt;作業単位で実態、判断、例外、負荷を確認する"]
+        O3["アウトプット&lt;br/&gt;F03 作業ヒアリング票"]
+        I3 --> W3 --> O3
+    end
+
+    subgraph P4["4. 現状フローを整理する"]
+        direction LR
+        I4["インプット&lt;br/&gt;F03 作業ヒアリング票"]
+        W4["作業&lt;br/&gt;作業の順序、受渡し、判断・例外を整理する"]
+        O4["アウトプット&lt;br/&gt;F04 業務フロー整理票"]
+        I4 --> W4 --> O4
+    end
+
+    subgraph P5["5. 問題を分析し、改善案を選ぶ"]
+        direction LR
+        I5["インプット&lt;br/&gt;F03・F04&lt;br/&gt;現場の問題・課題"]
+        W5["作業&lt;br/&gt;原因・影響を分析し、改善案を比較・選定する"]
+        O5["アウトプット&lt;br/&gt;F05 問題・課題一覧&lt;br/&gt;F06 改善案評価票&lt;br/&gt;F11 意思決定記録"]
+        I5 --> W5 --> O5
+    end
+
+    subgraph P6["6. 改善後の業務と要件を定義する"]
+        direction LR
+        I6["インプット&lt;br/&gt;F06 改善案評価票&lt;br/&gt;選定した改善方針"]
+        W6["作業&lt;br/&gt;改善後の作業・役割・引渡し条件と要件を定義する"]
+        O6["アウトプット&lt;br/&gt;F07 To-Be作業定義票&lt;br/&gt;F08 要求事項一覧"]
+        I6 --> W6 --> O6
+    end
+
+    subgraph P7["7. 実施後の効果を確認する"]
+        direction LR
+        I7["インプット&lt;br/&gt;F07・F08&lt;br/&gt;改善実施結果・効果測定データ"]
+        W7["作業&lt;br/&gt;効果、残課題、標準化・フォローアップを確認する"]
+        O7["アウトプット&lt;br/&gt;F09 効果確認票"]
+        I7 --> W7 --> O7
+    end
+
+    O1 --> I2
+    O2 --> I3
+    O3 --> I4
+    O4 --> I5
+    O5 --> I6
+    O6 --> I7
+
+    A["随時発生する確認事項・対応事項"] --> F10["F10 課題・宿題管理表"]
+    F10 -. 対応・確認結果を反映 .-> W2
+    F10 -.-> W3
+    F10 -.-> W5
+    F10 -.-> W7
+
+    classDef input fill:#eaf4fb,stroke:#5784a0,color:#18354a
+    classDef work fill:#fff4db,stroke:#af7a22,color:#4a3210
+    classDef output fill:#e8f4ec,stroke:#4c8b61,color:#173d25
+    class I1,I2,I3,I4,I5,I6,I7 input
+    class W1,W2,W3,W4,W5,W6,W7 work
+    class O1,O2,O3,O4,O5,O6,O7,F10 output
+        </pre>
+    </div>
+</section>
+
+<section class="panel mt-4">
+    <h2>帳票の位置付け</h2>
+    <p class="mb-0">F10は特定工程の完了成果物ではなく、調査・検討・実施の各工程で発生する確認事項と対応を横断管理する帳票です。</p>
+</section>
+
+@section Scripts {
+    <script src="~/lib/mermaid/mermaid.min.js" asp-append-version="true"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true, securityLevel: 'strict', theme: 'neutral' });
+    </script>
+}

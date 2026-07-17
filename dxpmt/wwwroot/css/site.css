@@ -77,6 +77,8 @@ textarea.form-control { min-height: 2.6rem; }
 .workflow-link:hover { background: var(--app-sky); border-color: #8fb1c2; color: inherit; }
 .workflow-link strong, .workflow-link small { display: block; }.workflow-link small { color: var(--app-muted); font-size: .78rem; margin-top: .2rem; }
 .workflow-code { align-items: center; background: var(--app-navy); border-radius: .25rem; color: #fff; display: inline-flex; font-size: .78rem; font-weight: 700; justify-content: center; min-width: 2.7rem; padding: .35rem; }
+.mermaid-diagram { overflow-x: auto; padding: 1rem 0; }
+.mermaid-diagram .mermaid { min-width: 920px; text-align: center; }
 .gate-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
 .gate-card { border-left: 3px solid var(--app-blue); border-radius: .25rem; background: #f8fbfc; padding: 1rem; }
 .gate-card > div { align-items: center; display: flex; gap: .6rem; }.gate-card p { color: var(--app-muted); font-size: .84rem; margin: .7rem 0; }
