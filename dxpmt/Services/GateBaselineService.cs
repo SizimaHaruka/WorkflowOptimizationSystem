@@ -20,17 +20,26 @@ public sealed class GateBaselineService(ApplicationDbContext database)
     {
         foreach (var formType in GetTargets(review.Gate))
         {
-            var content = await GetContentAsync(caseId, formType);
+            var content = await GetContentAsync(caseId, formType, confirmedBy, now);
             if (content is null) continue;
             var version = (await database.GateBaselines.Where(x => x.CaseId == caseId && x.FormType == formType).MaxAsync(x => (int?)x.Version) ?? 0) + 1;
             database.GateBaselines.Add(new GateBaseline { CaseId = caseId, GateReview = review, Gate = review.Gate, FormType = formType, Version = version, ContentJson = content, ConfirmedBy = confirmedBy, ConfirmedAt = now });
         }
     }
 
-    private async Task<string?> GetContentAsync(int caseId, string formType)
+    private async Task<string?> GetContentAsync(int caseId, string formType, string confirmedBy, DateTime confirmedAt)
     {
         if (formType is FormTypes.Reception or FormTypes.SurveyPlan or FormTypes.AsIsFlow or FormTypes.EffectConfirmation)
-            return await database.CaseForms.Where(x => x.CaseId == caseId && x.FormType == formType).OrderByDescending(x => x.Version).Select(x => x.ContentJson).FirstOrDefaultAsync();
+        {
+            var form = await database.CaseForms.Where(x => x.CaseId == caseId && x.FormType == formType)
+                .OrderByDescending(x => x.Version).FirstOrDefaultAsync();
+            if (form is null) return null;
+
+            form.Status = FormStatuses.Confirmed;
+            form.ConfirmedBy = confirmedBy;
+            form.ConfirmedAt = confirmedAt;
+            return form.ContentJson;
+        }
         object content = formType switch
         {
             FormTypes.AsIsWorkItems => await database.WorkItems.AsNoTracking().Where(x => x.CaseId == caseId && x.WorkType == WorkItemTypes.AsIs && !x.IsDeleted).OrderBy(x => x.Sequence).ToListAsync(),

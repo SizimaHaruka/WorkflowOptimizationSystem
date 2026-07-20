@@ -20,6 +20,7 @@ builder.Services.Configure<GhauthOptions>(builder.Configuration.GetSection(Ghaut
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<CurrentUserService>();
 builder.Services.AddScoped<GateBaselineService>();
+builder.Services.AddSingleton<BaselineContentFormatter>();
 builder.Services.AddScoped<GhauthUserService>();
 builder.Services.AddScoped<ActiveDirectoryUserPrincipalNameResolver>();
 var authentication = builder.Configuration.GetSection(DxpmtAuthenticationOptions.SectionName).Get<DxpmtAuthenticationOptions>() ?? new();

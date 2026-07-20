@@ -53,6 +53,9 @@ public sealed class F02Model(ApplicationDbContext database) : PageModel
         }
 
         form.ContentJson = JsonSerializer.Serialize(Input);
+        form.Status = FormStatuses.Draft;
+        form.ConfirmedBy = null;
+        form.ConfirmedAt = null;
         form.UpdatedAt = now;
         Case.UpdatedAt = now;
         await database.SaveChangesAsync();
