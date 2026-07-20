@@ -23,8 +23,23 @@ internal static class E2ETestRunner
         {
             Directory.CreateDirectory(settings.ArtifactsDirectory);
             var fileName = string.Concat(testName.Select(character => char.IsLetterOrDigit(character) ? character : '_'));
-            await File.WriteAllTextAsync(Path.Combine(settings.ArtifactsDirectory, $"{fileName}.html"), await page.ContentAsync());
-            await page.ScreenshotAsync(new PageScreenshotOptions { Path = Path.Combine(settings.ArtifactsDirectory, $"{fileName}.png"), FullPage = true });
+            try
+            {
+                await File.WriteAllTextAsync(Path.Combine(settings.ArtifactsDirectory, $"{fileName}.html"), await page.ContentAsync());
+            }
+            catch (PlaywrightException)
+            {
+                // 画面遷移中はHTMLを取得できない。元のテスト失敗を優先する。
+            }
+
+            try
+            {
+                await page.ScreenshotAsync(new PageScreenshotOptions { Path = Path.Combine(settings.ArtifactsDirectory, $"{fileName}.png"), FullPage = true });
+            }
+            catch (PlaywrightException)
+            {
+                // ブラウザーの終了・遷移中は画面を保存できない。
+            }
             throw;
         }
     }
