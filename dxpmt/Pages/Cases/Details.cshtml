@@ -140,7 +140,7 @@
                         <tbody>
                         @foreach (var form in Model.Case.Forms.OrderBy(x => x.FormType).ThenByDescending(x => x.Version))
                         {
-                            <tr><td>@form.FormType</td><td>第@form.Version 版</td><td>@form.Status</td><td>@form.UpdatedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm")</td></tr>
+                            <tr><td>@form.FormType</td><td>第@(form.Version)版</td><td>@form.Status</td><td>@form.UpdatedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm")</td></tr>
                         }
                         </tbody>
                     </table>
