@@ -50,10 +50,11 @@ public sealed class GateModel(ApplicationDbContext database, CurrentUserService 
         if (gate != Gates.G0 && Input.Decision == GateDecisions.Approved)
         {
             var priorGate = Gates.All[Gates.All.ToList().IndexOf(gate) - 1];
-            var priorApproved = await database.GateReviews.AnyAsync(x => x.CaseId == caseId && x.Gate == priorGate && x.Decision == GateDecisions.Approved);
-            if (!priorApproved)
+            var priorReview = await database.GateReviews.Where(x => x.CaseId == caseId && x.Gate == priorGate)
+                .OrderByDescending(x => x.CreatedAt).FirstOrDefaultAsync();
+            if (priorReview?.Decision != GateDecisions.Approved)
             {
-                ModelState.AddModelError(string.Empty, $"{gate} を承認する前に、{priorGate} の承認を完了してください。");
+                ModelState.AddModelError(string.Empty, $"{gate} を承認する前に、{priorGate} の最新判定を承認にしてください。");
             }
         }
 
