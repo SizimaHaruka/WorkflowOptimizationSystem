@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace dxpmt.Pages.Cases;
 
-public sealed class GateModel(ApplicationDbContext database, CurrentUserService currentUser) : PageModel
+public sealed class GateModel(ApplicationDbContext database, CurrentUserService currentUser, GateBaselineService gateBaselineService) : PageModel
 {
     [BindProperty]
     public GateReviewInput Input { get; set; } = new();
@@ -18,6 +18,7 @@ public sealed class GateModel(ApplicationDbContext database, CurrentUserService 
     public string Gate { get; private set; } = string.Empty;
     public string GateName => Gates.GetName(Gate);
     public string ReviewerName => currentUser.DisplayName;
+    public IReadOnlyList<string> BaselineTargets => gateBaselineService.GetTargets(Gate);
 
     public async Task<IActionResult> OnGetAsync(int caseId, string gate)
     {
@@ -59,7 +60,7 @@ public sealed class GateModel(ApplicationDbContext database, CurrentUserService 
         if (!ModelState.IsValid) return Page();
 
         var now = DateTime.UtcNow;
-        database.GateReviews.Add(new GateReview
+        var review = new GateReview
         {
             CaseId = caseId,
             Gate = gate,
@@ -69,11 +70,12 @@ public sealed class GateModel(ApplicationDbContext database, CurrentUserService 
             Comment = Input.Comment?.Trim() ?? string.Empty,
             ChecklistJson = JsonSerializer.Serialize(Input.ChecklistFor(gate)),
             CreatedAt = now
-        });
+        };
+        database.GateReviews.Add(review);
 
-        if (Input.Decision is GateDecisions.Approved or GateDecisions.Returned)
+        if (Input.Decision == GateDecisions.Approved)
         {
-            await CaptureFormVersionsAsync(caseId, now);
+            await gateBaselineService.CaptureAsync(caseId, review, ReviewerName, now);
         }
 
         if (Input.Decision == GateDecisions.Returned)
@@ -130,29 +132,6 @@ public sealed class GateModel(ApplicationDbContext database, CurrentUserService 
         if (item is null) return false;
         Case = item;
         return true;
-    }
-
-    private async Task CaptureFormVersionsAsync(int caseId, DateTime now)
-    {
-        var currentForms = await database.CaseForms
-            .Where(x => x.CaseId == caseId)
-            .GroupBy(x => x.FormType)
-            .Select(group => group.OrderByDescending(x => x.Version).First())
-            .ToListAsync();
-
-        foreach (var form in currentForms)
-        {
-            form.Status = FormStatuses.Confirmed;
-            database.CaseForms.Add(new CaseForm
-            {
-                CaseId = form.CaseId,
-                FormType = form.FormType,
-                Version = form.Version + 1,
-                Status = FormStatuses.Draft,
-                ContentJson = form.ContentJson,
-                UpdatedAt = now
-            });
-        }
     }
 
     private async Task SetSuggestedChecklistAsync()

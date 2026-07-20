@@ -5,7 +5,7 @@
 }
 <div class="page-heading d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4"><div><p class="eyebrow">@Model.Case.CaseNumber / @Model.Gate</p><h1>@Model.GateName</h1><p class="text-muted mb-0">完了条件、判断者、判断日、コメントを記録します。</p></div><a class="btn btn-outline-secondary" asp-page="/Cases/Details" asp-route-id="@Model.Case.Id">案件詳細へ戻る</a></div>
 <form method="post" class="form-card"><input type="hidden" name="caseId" value="@Model.Case.Id" /><input type="hidden" name="gate" value="@Model.Gate" /><div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-    <section class="form-section"><h2>完了条件</h2><p class="text-muted small">承認する場合は、すべての項目を確認してください。差戻しの場合は未完了項目を残したまま記録できます。</p><div class="checklist">
+    <section class="form-section"><h2>完了条件</h2><p class="text-muted small">承認する場合は、すべての項目を確認してください。差戻しの場合は未完了項目を残したまま記録できます。</p><p class="text-muted small mb-3">承認時に確定する基準版: @string.Join("、", Model.BaselineTargets)</p><div class="checklist">
         @if (Model.Gate == Gates.G0)
         {
             <label><input asp-for="Input.ProblemIsClear" class="form-check-input" /> 問題が明確である</label>

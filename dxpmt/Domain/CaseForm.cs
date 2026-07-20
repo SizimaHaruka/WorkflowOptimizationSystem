@@ -19,7 +19,12 @@ public static class FormTypes
 {
     public const string Reception = "F01";
     public const string SurveyPlan = "F02";
+    public const string AsIsWorkItems = "F03";
     public const string AsIsFlow = "F04";
+    public const string Problems = "F05";
+    public const string ImprovementOptions = "F06";
+    public const string ToBeWorkItems = "F07";
+    public const string Requirements = "F08";
     public const string EffectConfirmation = "F09";
 }
 
