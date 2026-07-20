@@ -13,10 +13,10 @@
 }
 else
 {
-    <div class="table-responsive form-card p-0"><table class="table table-hover align-middle mb-0"><thead><tr><th>No.</th><th>改善案</th><th>対象問題</th><th>期待効果</th><th>推奨度</th><th>状態</th></tr></thead><tbody>
+    <div class="table-responsive form-card p-0"><table class="table table-hover align-middle mb-0"><thead><tr><th>No.</th><th>改善案</th><th>対象問題</th><th>期待効果</th><th>推奨度</th><th>状態</th><th></th></tr></thead><tbody>
     @foreach (var item in Model.Items)
     {
-        <tr><td>@item.Sequence</td><td><strong>@item.Title</strong><br /><small class="text-muted">@item.Approach</small></td><td>@(item.Problem?.Phenomenon ?? "横断・未紐付け")</td><td>@item.ExpectedEffect</td><td><span class="badge text-bg-light">@item.Recommendation</span></td><td>@item.Status</td></tr>
+        <tr><td>@item.Sequence</td><td><strong>@item.Title</strong><br /><small class="text-muted">@item.Approach</small></td><td>@(item.Problem?.Phenomenon ?? "横断・未紐付け")</td><td>@item.ExpectedEffect</td><td><span class="badge text-bg-light">@item.Recommendation</span></td><td>@item.Status</td><td><a class="btn btn-outline-primary btn-sm" asp-page="Edit" asp-route-id="@item.Id">編集</a></td></tr>
     }
     </tbody></table></div>
 }
