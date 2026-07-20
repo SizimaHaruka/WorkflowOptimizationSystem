@@ -180,8 +180,8 @@
             </dl>
         </section>
         <section class="panel">
-            <h2>ステータス変更</h2>
-            <p class="small text-muted">認証導入前のため、変更者を入力して履歴に残します。</p>
+            <h2>例外状態の記録</h2>
+            <p class="small text-muted">工程の状態はゲート判定で遷移します。ここでは保留・中止だけを記録できます。</p>
             <form method="post" asp-page-handler="ChangeStatus">
                 <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
                 <div class="mb-3">
@@ -204,7 +204,7 @@
                     <label asp-for="StatusChange.Comment" class="form-label"></label>
                     <textarea asp-for="StatusChange.Comment" class="form-control" rows="3"></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">変更を記録</button>
+                <button type="submit" class="btn btn-primary w-100">例外状態を記録</button>
             </form>
         </section>
     </aside>

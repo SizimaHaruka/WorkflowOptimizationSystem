@@ -22,7 +22,7 @@ public sealed class DetailsModel(ApplicationDbContext database, CurrentUserServi
     [TempData]
     public string? SuccessMessage { get; set; }
 
-    public IReadOnlyList<string> StatusOptions => CaseStatuses.All;
+    public IReadOnlyList<string> StatusOptions => [CaseStatuses.OnHold, CaseStatuses.Cancelled];
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
@@ -90,9 +90,9 @@ public sealed class DetailsModel(ApplicationDbContext database, CurrentUserServi
     {
         StatusChange.ChangedBy = currentUser.DisplayName;
         ModelState.Remove("StatusChange.ChangedBy");
-        if (!CaseStatuses.All.Contains(StatusChange.NewStatus))
+        if (!StatusOptions.Contains(StatusChange.NewStatus))
         {
-            ModelState.AddModelError("StatusChange.NewStatus", "有効なステータスを選択してください。");
+            ModelState.AddModelError("StatusChange.NewStatus", "手動で記録できる状態は保留または中止のみです。");
         }
 
         if (!ModelState.IsValid)
