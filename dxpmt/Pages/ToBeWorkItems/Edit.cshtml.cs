@@ -21,6 +21,6 @@ public sealed class EditModel(ApplicationDbContext database) : PageModel
     }
     private async Task<bool> LoadAsync(int id) { var item = await database.WorkItems.SingleOrDefaultAsync(x => x.Id == id && x.WorkType == WorkItemTypes.ToBe && !x.IsDeleted); if (item is null) return false; Item = item; ImprovementOptions = await database.ImprovementOptions.Where(x => x.CaseId == item.CaseId).OrderBy(x => x.Sequence).ToListAsync(); return true; }
     private async Task<int?> GetOptionIdAsync() => await database.TraceLinks.Where(x => x.CaseId == Item.CaseId && x.SourceType == TraceLinkTypes.ImprovementOption && x.TargetType == TraceLinkTypes.WorkItem && x.TargetId == Item.Id).Select(x => (int?)x.SourceId).FirstOrDefaultAsync();
-    private static Content Read(string json) { try { return JsonSerializer.Deserialize<Content>(json) ?? new(); } catch { return new(); } }
-    private sealed class Content { public string? Purpose { get; set; } public string? StartTrigger { get; set; } public string? CompletionCondition { get; set; } public string? Handover { get; set; } public string? Exceptions { get; set; } }
+    private static ToBeContent Read(string json) { try { return JsonSerializer.Deserialize<ToBeContent>(json) ?? new(); } catch { return new(); } }
+    private sealed class ToBeContent { public string? Purpose { get; set; } public string? StartTrigger { get; set; } public string? CompletionCondition { get; set; } public string? Handover { get; set; } public string? Exceptions { get; set; } }
 }
