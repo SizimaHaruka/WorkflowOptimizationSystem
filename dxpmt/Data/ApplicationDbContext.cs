@@ -10,6 +10,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     public DbSet<ActionItem> ActionItems => Set<ActionItem>();
     public DbSet<DecisionRecord> DecisionRecords => Set<DecisionRecord>();
     public DbSet<GateReview> GateReviews => Set<GateReview>();
+    public DbSet<GateBaseline> GateBaselines => Set<GateBaseline>();
     public DbSet<CaseStatusHistory> CaseStatusHistories => Set<CaseStatusHistory>();
     public DbSet<WorkItem> WorkItems => Set<WorkItem>();
     public DbSet<Problem> Problems => Set<Problem>();
@@ -74,6 +75,17 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
             entity.Property(x => x.Comment).HasMaxLength(2000);
             entity.Property(x => x.ChecklistJson).IsRequired();
             entity.HasOne(x => x.Case).WithMany(x => x.GateReviews).HasForeignKey(x => x.CaseId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<GateBaseline>(entity =>
+        {
+            entity.HasIndex(x => new { x.CaseId, x.FormType, x.Version }).IsUnique();
+            entity.Property(x => x.Gate).HasMaxLength(10).IsRequired();
+            entity.Property(x => x.FormType).HasMaxLength(10).IsRequired();
+            entity.Property(x => x.ContentJson).IsRequired();
+            entity.Property(x => x.ConfirmedBy).HasMaxLength(100).IsRequired();
+            entity.HasOne(x => x.Case).WithMany().HasForeignKey(x => x.CaseId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(x => x.GateReview).WithMany().HasForeignKey(x => x.GateReviewId).OnDelete(DeleteBehavior.NoAction);
         });
 
         modelBuilder.Entity<CaseStatusHistory>(entity =>

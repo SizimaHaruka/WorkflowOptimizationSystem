@@ -32,6 +32,7 @@
             <p class="small text-muted mt-2 mb-0">受付日: @Model.Case.RegisteredOn.ToString("yyyy/MM/dd")</p>
             <a class="btn btn-outline-secondary btn-sm mt-2" asp-page-handler="ExportMarkdown" asp-route-id="@Model.Case.Id">Markdown出力</a>
             <a class="btn btn-outline-secondary btn-sm mt-2" asp-page-handler="ExportCsv" asp-route-id="@Model.Case.Id">CSV出力</a>
+            <a class="btn btn-outline-secondary btn-sm mt-2" asp-page="/Cases/Baselines" asp-route-caseId="@Model.Case.Id">基準版履歴</a>
         </div>
     </div>
 </div>

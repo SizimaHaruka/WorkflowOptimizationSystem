@@ -79,6 +79,7 @@ textarea.form-control { min-height: 2.6rem; }
 .workflow-code { align-items: center; background: var(--app-navy); border-radius: .25rem; color: #fff; display: inline-flex; font-size: .78rem; font-weight: 700; justify-content: center; min-width: 2.7rem; padding: .35rem; }
 .mermaid-diagram { overflow-x: auto; padding: 1rem 0; }
 .mermaid-diagram .mermaid { min-width: 920px; text-align: center; }
+.version-content { background: #f8fafc; border: 1px solid var(--app-border); border-radius: .4rem; font-size: .82rem; max-height: 24rem; max-width: 48rem; overflow: auto; padding: .75rem; white-space: pre-wrap; }
 .gate-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
 .gate-card { border-left: 3px solid var(--app-blue); border-radius: .25rem; background: #f8fbfc; padding: 1rem; }
 .gate-card > div { align-items: center; display: flex; gap: .6rem; }.gate-card p { color: var(--app-muted); font-size: .84rem; margin: .7rem 0; }
