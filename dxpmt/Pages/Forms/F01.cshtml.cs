@@ -51,6 +51,9 @@ public sealed class F01Model(ApplicationDbContext database) : PageModel
         }
 
         form.ContentJson = JsonSerializer.Serialize(Input);
+        form.Status = FormStatuses.Draft;
+        form.ConfirmedBy = null;
+        form.ConfirmedAt = null;
         form.UpdatedAt = now;
         Case.ScopeSummary = Input.ScopeSummary?.Trim() ?? string.Empty;
         Case.UpdatedAt = now;
