@@ -36,6 +36,7 @@ builder.Services.AddScoped<CurrentUserService>();
 builder.Services.AddScoped<GateBaselineService>();
 builder.Services.AddScoped<GateCompletionService>();
 builder.Services.AddSingleton<BaselineContentFormatter>();
+builder.Services.AddSingleton<BaselineDiffService>();
 builder.Services.AddScoped<GhauthUserService>();
 builder.Services.AddScoped<ActiveDirectoryUserPrincipalNameResolver>();
 var authentication = builder.Configuration.GetSection(DxpmtAuthenticationOptions.SectionName).Get<DxpmtAuthenticationOptions>() ?? new();
