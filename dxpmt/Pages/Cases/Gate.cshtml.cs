@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace dxpmt.Pages.Cases;
 
-public sealed class GateModel(ApplicationDbContext database, CurrentUserService currentUser, GateBaselineService gateBaselineService) : PageModel
+public sealed class GateModel(ApplicationDbContext database, CurrentUserService currentUser, GateBaselineService gateBaselineService, GateCompletionService gateCompletionService) : PageModel
 {
     [BindProperty]
     public GateReviewInput Input { get; set; } = new();
@@ -19,6 +19,7 @@ public sealed class GateModel(ApplicationDbContext database, CurrentUserService 
     public string GateName => Gates.GetName(Gate);
     public string ReviewerName => currentUser.DisplayName;
     public IReadOnlyList<string> BaselineTargets => gateBaselineService.GetTargets(Gate);
+    public IReadOnlyList<GateCompletionCondition> CompletionConditions { get; private set; } = [];
 
     public async Task<IActionResult> OnGetAsync(int caseId, string gate)
     {
@@ -28,6 +29,7 @@ public sealed class GateModel(ApplicationDbContext database, CurrentUserService 
         Input.ReviewerName = ReviewerName;
         Input.Decision = GateDecisions.Approved;
         await SetSuggestedChecklistAsync();
+        await SetCompletionConditionsAsync();
         return Page();
     }
 
@@ -37,14 +39,27 @@ public sealed class GateModel(ApplicationDbContext database, CurrentUserService 
         Gate = gate;
         Input.ReviewerName = ReviewerName;
         ModelState.Remove("Input.ReviewerName");
+        if (gate is Gates.G3 or Gates.G4 or Gates.G5 or Gates.G6)
+        {
+            await SetCompletionConditionsAsync();
+        }
+
         if (Input.Decision is not GateDecisions.Approved and not GateDecisions.Returned)
         {
             ModelState.AddModelError("Input.Decision", "承認または差戻しを選択してください。");
         }
 
-        if (Input.Decision == GateDecisions.Approved && !Input.IsChecklistComplete(gate))
+        if (Input.Decision == GateDecisions.Approved && gate is (Gates.G0 or Gates.G1 or Gates.G2) && !Input.IsChecklistComplete(gate))
         {
             ModelState.AddModelError(string.Empty, "承認するには、すべての完了条件を確認してください。");
+        }
+
+        if (Input.Decision == GateDecisions.Approved && gate is (Gates.G3 or Gates.G4 or Gates.G5 or Gates.G6))
+        {
+            foreach (var condition in CompletionConditions.Where(x => !x.IsSatisfied))
+            {
+                ModelState.AddModelError(string.Empty, $"承認するには、完了条件を満たしてください: {condition.Label}");
+            }
         }
 
         if (gate != Gates.G0 && Input.Decision == GateDecisions.Approved)
@@ -69,7 +84,7 @@ public sealed class GateModel(ApplicationDbContext database, CurrentUserService 
             ReviewerName = ReviewerName,
             ReviewedOn = Input.ReviewedOn,
             Comment = Input.Comment?.Trim() ?? string.Empty,
-            ChecklistJson = JsonSerializer.Serialize(Input.ChecklistFor(gate)),
+            ChecklistJson = JsonSerializer.Serialize(Input.ChecklistFor(gate, CompletionConditions)),
             CreatedAt = now
         };
         database.GateReviews.Add(review);
@@ -166,18 +181,19 @@ public sealed class GateModel(ApplicationDbContext database, CurrentUserService 
             Input.JudgementsAreConfirmed = content?.AreJudgementCriteriaConfirmed == true;
             Input.ExceptionsAreIncluded = content?.AreExceptionsIncluded == true;
         }
-        else
-        {
-            var options = await database.ImprovementOptions.CountAsync(x => x.CaseId == Case.Id);
-            var toBe = await database.WorkItems.CountAsync(x => x.CaseId == Case.Id && x.WorkType == WorkItemTypes.ToBe && !x.IsDeleted);
-            var requirements = await database.Requirements.CountAsync(x => x.CaseId == Case.Id);
-            var effectFormExists = await database.CaseForms.AnyAsync(x => x.CaseId == Case.Id && x.FormType == FormTypes.EffectConfirmation);
-            Input.WorkItemsAreConfirmed = Gate == Gates.G3 ? options > 0 : Gate == Gates.G6 ? effectFormExists : toBe > 0;
-            Input.FlowIsConnected = Gate is Gates.G5 or Gates.G6 ? requirements > 0 : true;
-            Input.InputsOutputsAreConfirmed = true;
-            Input.JudgementsAreConfirmed = true;
-            Input.ExceptionsAreIncluded = true;
-        }
+    }
+
+    private async Task SetCompletionConditionsAsync()
+    {
+        CompletionConditions = await gateCompletionService.GetConditionsAsync(Case.Id, Gate);
+        if (CompletionConditions.Count == 0) return;
+
+        var satisfied = CompletionConditions.Select(x => x.IsSatisfied).ToArray();
+        Input.WorkItemsAreConfirmed = satisfied.ElementAtOrDefault(0);
+        Input.FlowIsConnected = satisfied.ElementAtOrDefault(1);
+        Input.InputsOutputsAreConfirmed = satisfied.ElementAtOrDefault(2);
+        Input.JudgementsAreConfirmed = satisfied.ElementAtOrDefault(3);
+        Input.ExceptionsAreIncluded = satisfied.ElementAtOrDefault(4);
     }
 
     private static T? Deserialize<T>(string? contentJson)
@@ -220,11 +236,12 @@ public sealed class GateModel(ApplicationDbContext database, CurrentUserService 
             _ => false
         };
 
-        public object ChecklistFor(string gate) => gate switch
+        public object ChecklistFor(string gate, IReadOnlyList<GateCompletionCondition> completionConditions) => gate switch
         {
             Gates.G0 => new { ProblemIsClear, RequesterIsClear, OwnerIsClear, ScopeIsClear },
             Gates.G1 => new { StartEventIsClear, EndStateIsClear, TargetDepartmentsAreAgreed, ExcludedScopeIsAgreed },
-            _ => new { WorkItemsAreConfirmed, FlowIsConnected, InputsOutputsAreConfirmed, JudgementsAreConfirmed, ExceptionsAreIncluded }
+            Gates.G2 => new { WorkItemsAreConfirmed, FlowIsConnected, InputsOutputsAreConfirmed, JudgementsAreConfirmed, ExceptionsAreIncluded },
+            _ => new { CompletionConditions = completionConditions.Select(x => new { x.Label, x.IsSatisfied }) }
         };
     }
 }
